@@ -68,6 +68,14 @@ def get_recent_form(team_id, last_n=5):
     return data
 
 
+def get_league_info(league_id, season):
+    """
+    Debug helper: check what your API plan actually has access to for this
+    league/season (useful for diagnosing free-tier season restrictions).
+    """
+    return _get("leagues", {"id": league_id, "season": season})
+
+
 def get_fixtures_by_league(league_id, season, status="FT"):
     """
     Pull all fixtures for a league/season, optionally filtered by status.

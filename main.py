@@ -29,6 +29,57 @@ from model import OutcomeModel, ScorePredictionModel
 OUTCOME_LABELS = {0: "Away Win", 1: "Draw", 2: "Home Win"}
 
 
+def run_manual():
+    """
+    NO API CALLS AT ALL. Trains on a large synthetic-but-realistic dataset
+    (same generator as --demo) so the model learns general patterns of how
+    win_rate/goals/form/squad_strength relate to match outcomes -- then
+    predicts the specific Netherlands vs Sweden matchup using REAL numbers
+    you typed into manual_stats.py by hand.
+
+    This is the most reliable free option: no rate limits, no paid tiers,
+    no season restrictions, ever.
+    """
+    from demo_data import generate_synthetic_dataset
+    import manual_stats
+
+    print("Running in MANUAL mode (no API calls, using your hand-entered stats)\n")
+
+    X, y_outcome, y_home_goals, y_away_goals = generate_synthetic_dataset()
+    outcome_model = OutcomeModel().fit(X, y_outcome)
+    score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
+
+    nl = manual_stats.NETHERLANDS
+    se = manual_stats.SWEDEN
+    h2h = manual_stats.HEAD_TO_HEAD
+
+    row = pd.DataFrame([{
+        "team1_win_rate": nl["win_rate"],
+        "team2_win_rate": se["win_rate"],
+        "team1_goals_for_avg": nl["goals_for_avg"],
+        "team2_goals_for_avg": se["goals_for_avg"],
+        "team1_goals_against_avg": nl["goals_against_avg"],
+        "team2_goals_against_avg": se["goals_against_avg"],
+        "team1_form_points_avg": nl["form_points_avg"],
+        "team2_form_points_avg": se["form_points_avg"],
+        "team1_squad_strength": nl["squad_strength"],
+        "team2_squad_strength": se["squad_strength"],
+    }])
+    row["diff_win_rate"] = row["team1_win_rate"] - row["team2_win_rate"]
+    row["diff_goals_for_avg"] = row["team1_goals_for_avg"] - row["team2_goals_for_avg"]
+    row["diff_goals_against_avg"] = row["team1_goals_against_avg"] - row["team2_goals_against_avg"]
+    row["diff_form_points"] = row["team1_form_points_avg"] - row["team2_form_points_avg"]
+    row["diff_squad_strength"] = row["team1_squad_strength"] - row["team2_squad_strength"]
+
+    row = row.reindex(columns=X.columns, fill_value=0)
+
+    print(f"(Using head-to-head: Netherlands win rate vs Sweden = {h2h['team1_win_rate']}, "
+          f"avg goal diff = {h2h['avg_goal_diff']} -- not yet fed into the model features "
+          f"directly here, but useful context for you when sanity-checking the result.)\n")
+
+    _print_prediction("Netherlands", "Sweden", outcome_model, score_model, row)
+
+
 def run_demo():
     from demo_data import generate_synthetic_dataset
 
@@ -168,10 +219,15 @@ def _print_prediction(team1_name, team2_name, outcome_model, score_model, featur
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--demo", action="store_true", help="Run with synthetic data, no API key needed")
+    parser.add_argument("--demo", action="store_true", help="Run with fully synthetic data, no API key needed")
+    parser.add_argument("--manual", action="store_true", help="Run with your hand-entered real stats (manual_stats.py), no API needed")
+    parser.add_argument("--live", action="store_true", help="Run with live API data (needs FOOTBALL_API_KEY)")
     args = parser.parse_args()
 
     if args.demo:
         run_demo()
-    else:
+    elif args.live:
         run_live()
+    else:
+        # default: manual mode, since it's the most reliable free option
+        run_manual()
