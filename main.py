@@ -1,7 +1,7 @@
 """
 main.py
 --------
-Predicts Morocco vs Scotland: win/draw/loss probabilities AND a predicted
+Predicts Germany vs Ivory Coast: win/draw/loss probabilities AND a predicted
 final scoreline.
 
 RUN MODES
@@ -32,8 +32,8 @@ OUTCOME_LABELS = {0: "Away Win", 1: "Draw", 2: "Home Win"}
 def run_manual():
     """
     NO API CALLS AT ALL. Trains on a large synthetic-but-realistic dataset
-    so the model learns general patterns -- then predicts Netherlands vs
-    Sweden using REAL numbers from manual_stats.py, including:
+    so the model learns general patterns -- then predicts Germany vs
+    Ivory Coast using REAL numbers from manual_stats.py, including:
       - team-level stats (win rate, goals, form)
       - PLAYER-LEVEL weighting: rating x start_prob x (1 + trend)
       - head-to-head record (real model feature)
@@ -61,8 +61,8 @@ def run_manual():
     outcome_model = OutcomeModel().fit(X, y_outcome)
     score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
 
-    nl = manual_stats.NETHERLANDS
-    se = manual_stats.SWEDEN
+    germany = manual_stats.GERMANY
+    ivory_coast = manual_stats.IVORY_COAST
     h2h = manual_stats.HEAD_TO_HEAD
     venue = manual_stats.VENUE
 
@@ -78,45 +78,45 @@ def run_manual():
             return sum(p["rating"] for p in players) / len(players)
         return weighted_sum / total_weight
 
-    nl_squad_strength = weighted_squad_strength(nl["players"])
-    se_squad_strength = weighted_squad_strength(se["players"])
+    germany_squad_strength = weighted_squad_strength(germany["players"])
+    ivory_coast_squad_strength = weighted_squad_strength(ivory_coast["players"])
 
     print("=== Player-weighted squad strength (rating x start_prob x trend) ===")
-    print(f"Netherlands: {nl_squad_strength:.2f}  (from {len(nl['players'])} players)")
-    print(f"Sweden:      {se_squad_strength:.2f}  (from {len(se['players'])} players)")
+    print(f"Germany:     {germany_squad_strength:.2f}  (from {len(germany['players'])} players)")
+    print(f"Ivory Coast: {ivory_coast_squad_strength:.2f}  (from {len(ivory_coast['players'])} players)")
     print()
 
     def top_contributors(players, n=5):
         scored = [(p, p["rating"] * (1 + p.get("trend", 0.0) * 0.15) * p["start_prob"]) for p in players]
         return sorted(scored, key=lambda x: x[1], reverse=True)[:n]
 
-    print("Top contributing Netherlands players (rating x trend x start_prob):")
-    for p, score in top_contributors(nl["players"]):
+    print("Top contributing Germany players (rating x trend x start_prob):")
+    for p, score in top_contributors(germany["players"]):
         print(f"  {p['id']:<20} rating={p['rating']}  trend={p.get('trend',0):+.1f}  start_prob={p['start_prob']}  contribution={score:.2f}")
-    print("Top contributing Sweden players (rating x trend x start_prob):")
-    for p, score in top_contributors(se["players"]):
+    print("Top contributing Ivory Coast players (rating x trend x start_prob):")
+    for p, score in top_contributors(ivory_coast["players"]):
         print(f"  {p['id']:<20} rating={p['rating']}  trend={p.get('trend',0):+.1f}  start_prob={p['start_prob']}  contribution={score:.2f}")
     print()
 
-    conditions_diff = nl["team_record_at_similar_conditions"] - se["team_record_at_similar_conditions"]
+    conditions_diff = germany["team_record_at_similar_conditions"] - ivory_coast["team_record_at_similar_conditions"]
     print(f"=== Pitch / conditions ===")
     print(f"Venue: {venue['venue_name']} | Pitch: {venue['pitch_type']} | "
           f"Altitude: {venue['altitude_m']}m | Conditions: {venue['expected_conditions']}")
-    print(f"Netherlands record in similar conditions: {nl['team_record_at_similar_conditions']:.2f}")
-    print(f"Sweden record in similar conditions:       {se['team_record_at_similar_conditions']:.2f}")
+    print(f"Germany record in similar conditions:     {germany['team_record_at_similar_conditions']:.2f}")
+    print(f"Ivory Coast record in similar conditions: {ivory_coast['team_record_at_similar_conditions']:.2f}")
     print()
 
     row = pd.DataFrame([{
-        "team1_win_rate": nl["win_rate"],
-        "team2_win_rate": se["win_rate"],
-        "team1_goals_for_avg": nl["goals_for_avg"],
-        "team2_goals_for_avg": se["goals_for_avg"],
-        "team1_goals_against_avg": nl["goals_against_avg"],
-        "team2_goals_against_avg": se["goals_against_avg"],
-        "team1_form_points_avg": nl["form_points_avg"],
-        "team2_form_points_avg": se["form_points_avg"],
-        "team1_squad_strength": nl_squad_strength,
-        "team2_squad_strength": se_squad_strength,
+        "team1_win_rate": germany["win_rate"],
+        "team2_win_rate": ivory_coast["win_rate"],
+        "team1_goals_for_avg": germany["goals_for_avg"],
+        "team2_goals_for_avg": ivory_coast["goals_for_avg"],
+        "team1_goals_against_avg": germany["goals_against_avg"],
+        "team2_goals_against_avg": ivory_coast["goals_against_avg"],
+        "team1_form_points_avg": germany["form_points_avg"],
+        "team2_form_points_avg": ivory_coast["form_points_avg"],
+        "team1_squad_strength": germany_squad_strength,
+        "team2_squad_strength": ivory_coast_squad_strength,
         "h2h_team1_win_rate": h2h["team1_win_rate"],
         "h2h_avg_goal_diff": h2h["avg_goal_diff"],
         "diff_conditions_record": conditions_diff,
@@ -129,7 +129,7 @@ def run_manual():
 
     row = row.reindex(columns=X.columns, fill_value=0)
 
-    _print_prediction("Netherlands", "Sweden", outcome_model, score_model, row)
+    _print_prediction("Germany", "Ivory Coast", outcome_model, score_model, row)
 
     backtest(manual_stats)
 
@@ -137,7 +137,7 @@ def run_manual():
 def backtest(manual_stats):
     """
     Tests how accurate the model's win/draw/loss CALL would have been on
-    real past Netherlands vs Sweden matches you've entered in
+    real past Germany vs Ivory Coast matches you've entered in
     manual_stats.KNOWN_PAST_RESULTS. This directly answers "how accurate
     does this work" using actual results, not synthetic validation accuracy.
 
@@ -150,25 +150,25 @@ def backtest(manual_stats):
     if not results:
         print("=== Backtest ===")
         print("No KNOWN_PAST_RESULTS filled in manual_stats.py yet -- add a few "
-              "real past Netherlands vs Sweden results there to test accuracy "
+              "real past Germany vs Ivory Coast results there to test accuracy "
               "against real outcomes.")
         return
 
     correct = 0
-    for is_nl_home, nl_goals, se_goals in results:
-        if nl_goals > se_goals:
-            actual = "Home Win" if is_nl_home else "Away Win"
-        elif nl_goals == se_goals:
+    for is_germany_home, germany_goals, ivory_coast_goals in results:
+        if germany_goals > ivory_coast_goals:
+            actual = "Home Win" if is_germany_home else "Away Win"
+        elif germany_goals == ivory_coast_goals:
             actual = "Draw"
         else:
-            actual = "Away Win" if is_nl_home else "Home Win"
+            actual = "Away Win" if is_germany_home else "Home Win"
         # NOTE: simplistic -- compares actual outcome label only, since we don't
         # re-run the model per historical date. Mainly useful once you've got
-        # several results logged to eyeball overall NL vs SE competitiveness.
-        print(f"  Netherlands {nl_goals}-{se_goals} Sweden -> actual: {actual}")
+        # several results logged to eyeball overall Germany vs Ivory Coast competitiveness.
+        print(f"  Germany {germany_goals}-{ivory_coast_goals} Ivory Coast -> actual: {actual}")
 
     print(f"\nLogged {len(results)} past result(s) above for manual comparison "
-          f"against the model's predicted Netherlands/Sweden/Draw probabilities.")
+          f"against the model's predicted Germany/Ivory Coast/Draw probabilities.")
 
 
 def run_demo():
@@ -181,12 +181,12 @@ def run_demo():
     outcome_model = OutcomeModel().fit(X, y_outcome)
     score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
 
-    # Build a single illustrative "Morocco vs Scotland" feature row.
+    # Build a single illustrative "Germany vs Ivory Coast" feature row.
     # These numbers are PLACEHOLDERS for demo purposes only -- in live mode
     # these get pulled from the real API for the actual teams.
-    morocco_vs_scotland = pd.DataFrame([{
-        "team1_win_rate": 0.55,             # Morocco
-        "team2_win_rate": 0.45,             # Scotland
+    germany_vs_ivory_coast = pd.DataFrame([{
+        "team1_win_rate": 0.65,             # Germany
+        "team2_win_rate": 0.50,             # Ivory Coast
         "team1_goals_for_avg": 1.6,
         "team2_goals_for_avg": 1.3,
         "team1_goals_against_avg": 0.9,
@@ -196,13 +196,13 @@ def run_demo():
         "team1_squad_strength": 7.4,
         "team2_squad_strength": 7.1,
     }])
-    morocco_vs_scotland["diff_win_rate"] = morocco_vs_scotland["team1_win_rate"] - morocco_vs_scotland["team2_win_rate"]
-    morocco_vs_scotland["diff_goals_for_avg"] = morocco_vs_scotland["team1_goals_for_avg"] - morocco_vs_scotland["team2_goals_for_avg"]
-    morocco_vs_scotland["diff_goals_against_avg"] = morocco_vs_scotland["team1_goals_against_avg"] - morocco_vs_scotland["team2_goals_against_avg"]
-    morocco_vs_scotland["diff_form_points"] = morocco_vs_scotland["team1_form_points_avg"] - morocco_vs_scotland["team2_form_points_avg"]
-    morocco_vs_scotland["diff_squad_strength"] = morocco_vs_scotland["team1_squad_strength"] - morocco_vs_scotland["team2_squad_strength"]
+    germany_vs_ivory_coast["diff_win_rate"] = germany_vs_ivory_coast["team1_win_rate"] - germany_vs_ivory_coast["team2_win_rate"]
+    germany_vs_ivory_coast["diff_goals_for_avg"] = germany_vs_ivory_coast["team1_goals_for_avg"] - germany_vs_ivory_coast["team2_goals_for_avg"]
+    germany_vs_ivory_coast["diff_goals_against_avg"] = germany_vs_ivory_coast["team1_goals_against_avg"] - germany_vs_ivory_coast["team2_goals_against_avg"]
+    germany_vs_ivory_coast["diff_form_points"] = germany_vs_ivory_coast["team1_form_points_avg"] - germany_vs_ivory_coast["team2_form_points_avg"]
+    germany_vs_ivory_coast["diff_squad_strength"] = germany_vs_ivory_coast["team1_squad_strength"] - germany_vs_ivory_coast["team2_squad_strength"]
 
-    _print_prediction("Morocco", "Scotland", outcome_model, score_model, morocco_vs_scotland)
+    _print_prediction("Germany", "Ivory Coast", outcome_model, score_model, germany_vs_ivory_coast)
 
 
 def run_live():
@@ -224,8 +224,8 @@ def run_live():
     LEAGUE_ID = 1
 
     print("Fetching team IDs...")
-    morocco_id, morocco_name = get_team_id("Morocco")
-    scotland_id, scotland_name = get_team_id("Scotland")
+    germany_id, germany_name = get_team_id("Germany")
+    ivory_coast_id, ivory_coast_name = get_team_id("Ivory Coast")
 
     # --- 1. Build training data from completed World Cup 2026 matches so far ---
     print(f"Fetching completed fixtures for league={LEAGUE_ID}, season={SEASON}...")
@@ -239,39 +239,39 @@ def run_live():
 
     X, y_outcome, y_home_goals, y_away_goals = build_training_dataset(fixtures, LEAGUE_ID, SEASON)
 
-    # --- 2. Build the live feature row for Morocco vs Scotland ---
-    morocco_stats = get_team_statistics(morocco_id, LEAGUE_ID, SEASON)
-    scotland_stats = get_team_statistics(scotland_id, LEAGUE_ID, SEASON)
-    morocco_form = get_recent_form(morocco_id, last_n=5)
-    scotland_form = get_recent_form(scotland_id, last_n=5)
-    h2h = get_head_to_head(morocco_id, scotland_id, last_n=10)
+    # --- 2. Build the live feature row for Germany vs Ivory Coast ---
+    germany_stats = get_team_statistics(germany_id, LEAGUE_ID, SEASON)
+    ivory_coast_stats = get_team_statistics(ivory_coast_id, LEAGUE_ID, SEASON)
+    germany_form = get_recent_form(germany_id, last_n=5)
+    ivory_coast_form = get_recent_form(ivory_coast_id, last_n=5)
+    h2h = get_head_to_head(germany_id, ivory_coast_id, last_n=10)
 
-    morocco_feats = {**team_season_features(morocco_stats, "team1"),
-                      **recent_form_features(morocco_form, morocco_id, "team1")}
-    scotland_feats = {**team_season_features(scotland_stats, "team2"),
-                       **recent_form_features(scotland_form, scotland_id, "team2")}
-    h2h_feats = head_to_head_features(h2h, morocco_id)
+    germany_feats = {**team_season_features(germany_stats, "team1"),
+                     **recent_form_features(germany_form, germany_id, "team1")}
+    ivory_coast_feats = {**team_season_features(ivory_coast_stats, "team2"),
+                         **recent_form_features(ivory_coast_form, ivory_coast_id, "team2")}
+    h2h_feats = head_to_head_features(h2h, germany_id)
 
     # --- 3. Player-weighted squad strength ---
-    morocco_squad = get_squad(morocco_id)
-    scotland_squad = get_squad(scotland_id)
+    germany_squad = get_squad(germany_id)
+    ivory_coast_squad = get_squad(ivory_coast_id)
 
     # TODO: replace with real per-player season ratings + minutes played
     # via get_player_statistics(player_id, SEASON) for each player, then:
     #   start_prob = estimate_start_probability(minutes_last5)
     # For now these dicts are empty, so player_weighted_strength() falls
     # back to a default average rating -- wire this up for full accuracy.
-    morocco_rating_lookup, morocco_start_prob_lookup = {}, {}
-    scotland_rating_lookup, scotland_start_prob_lookup = {}, {}
+    germany_rating_lookup, germany_start_prob_lookup = {}, {}
+    ivory_coast_rating_lookup, ivory_coast_start_prob_lookup = {}, {}
 
-    morocco_feats.update(player_weighted_strength(
-        morocco_squad, morocco_rating_lookup, morocco_start_prob_lookup, "team1"))
-    scotland_feats.update(player_weighted_strength(
-        scotland_squad, scotland_rating_lookup, scotland_start_prob_lookup, "team2"))
+    germany_feats.update(player_weighted_strength(
+        germany_squad, germany_rating_lookup, germany_start_prob_lookup, "team1"))
+    ivory_coast_feats.update(player_weighted_strength(
+        ivory_coast_squad, ivory_coast_rating_lookup, ivory_coast_start_prob_lookup, "team2"))
 
     venue_feats = {}  # TODO: wire up venue_features() once you have venue history data
 
-    match_row = build_match_feature_row(morocco_feats, scotland_feats, h2h_feats, venue_feats)
+    match_row = build_match_feature_row(germany_feats, ivory_coast_feats, h2h_feats, venue_feats)
     match_row = match_row.fillna(0)
 
     # --- 4. Train the models on real historical data, then predict ---
@@ -288,7 +288,7 @@ def run_live():
     # match_row's columns must match what the models were trained on
     match_row = match_row.reindex(columns=X.columns, fill_value=0)
 
-    _print_prediction(morocco_name, scotland_name, outcome_model, score_model, match_row)
+    _print_prediction(germany_name, ivory_coast_name, outcome_model, score_model, match_row)
 
 
 def _print_prediction(team1_name, team2_name, outcome_model, score_model, feature_row):
