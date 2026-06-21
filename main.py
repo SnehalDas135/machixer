@@ -1,22 +1,23 @@
 """
-main.py
---------
-Predicts Germany vs Ivory Coast: win/draw/loss probabilities AND a predicted
-final scoreline.
+main.py  (Belgium vs Iran)
+------------------------------------
+Predicts Belgium vs Iran: win/draw/loss probabilities AND a
+predicted final scoreline.
 
 RUN MODES
 =========
-1. DEMO MODE (no API key needed) -- runs right now on synthetic data so you
-   can confirm the pipeline works:
-       python main.py --demo
+1. REAL MODE (default, recommended) -- trains on ~49,000 real international
+   match results (free CSV, no API key, no signup) and pulls Belgium's and
+   Iran's actual current form + head-to-head automatically:
+       python3 main.py
 
-2. LIVE MODE (real data, needs FOOTBALL_API_KEY env var set):
-       python main.py
+2. DEMO MODE -- fully synthetic data, no internet needed at all, just to
+   sanity-check the code runs:
+       python3 main.py --demo
 
-In live mode, you'll still need to fill in a couple of TODOs marked below --
-mainly around pulling lineup/availability data, since "confirmed starting
-lineup" usually isn't released until ~60 minutes before kickoff. Until then
-we estimate start probability from recent minutes played.
+Player-level weighting (rating x start_prob x trend) and pitch/conditions
+come from manual_stats.py either way, since no free dataset has that level
+of detail -- fill in the TODOs there with real current squad info.
 """
 
 import argparse
@@ -25,270 +26,166 @@ import pandas as pd
 
 from model import OutcomeModel, ScorePredictionModel
 
-
 OUTCOME_LABELS = {0: "Away Win", 1: "Draw", 2: "Home Win"}
 
 
-def run_manual():
+def run_real():
     """
-    NO API CALLS AT ALL. Trains on a large synthetic-but-realistic dataset
-    so the model learns general patterns -- then predicts Germany vs
-    Ivory Coast using REAL numbers from manual_stats.py, including:
-      - team-level stats (win rate, goals, form)
-      - PLAYER-LEVEL weighting: rating x start_prob x (1 + trend)
-      - head-to-head record (real model feature)
-      - pitch/conditions: each team's historical record in similar conditions
+    Trains on real historical match data (1872-2024, free CSV from GitHub)
+    instead of synthetic data -- this is what actually gives the model real
+    predictive signal rather than near-random accuracy.
+
+    Team-level stats (win rate, goals, form) AND head-to-head are computed
+    automatically from real match history. Player-level scores are computed
+    by recency_scoring.py from real dated events (goals/assists/ratings),
+    not hand-assigned -- see manual_stats.py for data coverage notes.
     """
-    from demo_data import generate_synthetic_dataset
+    import historical_data
     import manual_stats
+    from recency_scoring import compute_squad_strength
 
-    print("Running in MANUAL mode (no API calls, using your hand-entered stats)\n")
+    TEAM1, TEAM2 = "Belgium", "Iran"
 
-    X, y_outcome, y_home_goals, y_away_goals = generate_synthetic_dataset()
+    print(f"Loading real historical match data for {TEAM1} vs {TEAM2}...")
+    df = historical_data.load_results(min_year=2005)
+    print(f"Loaded {len(df)} real matches.\n")
 
-    # Extend synthetic training data with the new feature columns so the
-    # model actually learns to use them (it can't weigh a column it never
-    # saw during training).
-    rng_squad1 = X["team1_win_rate"] * 3 + 5.5
-    rng_squad2 = X["team2_win_rate"] * 3 + 5.5
-    X["team1_squad_strength"] = rng_squad1
-    X["team2_squad_strength"] = rng_squad2
-    X["diff_squad_strength"] = rng_squad1 - rng_squad2
-    X["h2h_team1_win_rate"] = X["team1_win_rate"]
+    print("Building leakage-safe training features from real match history...")
+    X, y_outcome, y_home_goals, y_away_goals = historical_data.build_training_dataset(df)
+    print(f"Training on {len(X)} real matches.\n")
+
+    t1_stats = historical_data.get_current_team_stats(df, TEAM1)
+    t2_stats = historical_data.get_current_team_stats(df, TEAM2)
+    h2h = historical_data.get_head_to_head(df, TEAM1, TEAM2)
+
+    print(f"{TEAM1} real recent form (last {t1_stats['matches_used']} matches, "
+          f"through {t1_stats['last_match_date'].date()}): "
+          f"win_rate={t1_stats['win_rate']:.2f}, goals_for={t1_stats['goals_for_avg']:.2f}, "
+          f"goals_against={t1_stats['goals_against_avg']:.2f}, form={t1_stats['form_points_avg']:.2f}")
+    print(f"{TEAM2} real recent form (last {t2_stats['matches_used']} matches, "
+          f"through {t2_stats['last_match_date'].date()}): "
+          f"win_rate={t2_stats['win_rate']:.2f}, goals_for={t2_stats['goals_for_avg']:.2f}, "
+          f"goals_against={t2_stats['goals_against_avg']:.2f}, form={t2_stats['form_points_avg']:.2f}")
+
+    if h2h["matches_found"] > 0:
+        print(f"Real head-to-head (last {h2h['matches_found']} meetings): "
+              f"{TEAM1} win rate={h2h['team1_win_rate']:.2f}, avg goal diff={h2h['avg_goal_diff']:.2f}\n")
+    else:
+        print(f"No direct head-to-head matches found in the dataset between {TEAM1} and {TEAM2} "
+              f"-- using neutral defaults (0.5 win rate, 0 goal diff).\n")
+
+    g = manual_stats.BELGIUM
+    ic = manual_stats.IRAN
+    venue = manual_stats.VENUE
+
+    t1_squad_strength, t1_breakdown = compute_squad_strength(g["players"])
+    t2_squad_strength, t2_breakdown = compute_squad_strength(ic["players"])
+    print(f"Player-weighted squad strength -> {TEAM1}: {t1_squad_strength:.2f}, {TEAM2}: {t2_squad_strength:.2f}\n")
+
+    def _print_breakdown(team_name, breakdown):
+        print(f"{team_name} player scores (computed from real dated events where available):")
+        for b in sorted(breakdown, key=lambda x: x["contribution"], reverse=True):
+            tag = "real data" if b["real_data"] else "DEFAULT (no events logged yet)"
+            print(f"  {b['id']:<22} score={b['computed_score']:.2f}  start_prob={b['start_prob']}  "
+                  f"contribution={b['contribution']:.2f}  [{tag}]")
+
+    _print_breakdown(TEAM1, t1_breakdown)
+    _print_breakdown(TEAM2, t2_breakdown)
+    print()
+
+    # Add squad_strength + h2h as training columns too -- the real dataset
+    # doesn't have historical squad-strength data, so we proxy it with a
+    # signal correlated to real win_rate just so the model has *some* learned
+    # relationship for these columns; treat it as a secondary signal layered
+    # on top of the real team-stat signal, not the main driver of the result.
+    X = X.copy()
+    X["team1_squad_strength"] = X["diff_win_rate"] * 2 + 7.0
+    X["team2_squad_strength"] = 7.0 - X["diff_win_rate"] * 2
+    X["diff_squad_strength"] = X["team1_squad_strength"] - X["team2_squad_strength"]
+    X["h2h_team1_win_rate"] = X["diff_win_rate"].clip(0, 1)
     X["h2h_avg_goal_diff"] = X["diff_goals_for_avg"]
-    X["diff_conditions_record"] = X["diff_win_rate"]  # proxy correlation for training
 
     outcome_model = OutcomeModel().fit(X, y_outcome)
     score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
 
-    germany = manual_stats.GERMANY
-    ivory_coast = manual_stats.IVORY_COAST
-    h2h = manual_stats.HEAD_TO_HEAD
-    venue = manual_stats.VENUE
-
-    # --- PLAYER-LEVEL WEIGHTING, including performance TREND ---
-    def weighted_squad_strength(players):
-        total_weight = 0
-        weighted_sum = 0
-        for p in players:
-            trend_adjusted_rating = p["rating"] * (1 + p.get("trend", 0.0) * 0.15)
-            weighted_sum += trend_adjusted_rating * p["start_prob"]
-            total_weight += p["start_prob"]
-        if total_weight == 0:
-            return sum(p["rating"] for p in players) / len(players)
-        return weighted_sum / total_weight
-
-    germany_squad_strength = weighted_squad_strength(germany["players"])
-    ivory_coast_squad_strength = weighted_squad_strength(ivory_coast["players"])
-
-    print("=== Player-weighted squad strength (rating x start_prob x trend) ===")
-    print(f"Germany:     {germany_squad_strength:.2f}  (from {len(germany['players'])} players)")
-    print(f"Ivory Coast: {ivory_coast_squad_strength:.2f}  (from {len(ivory_coast['players'])} players)")
-    print()
-
-    def top_contributors(players, n=5):
-        scored = [(p, p["rating"] * (1 + p.get("trend", 0.0) * 0.15) * p["start_prob"]) for p in players]
-        return sorted(scored, key=lambda x: x[1], reverse=True)[:n]
-
-    print("Top contributing Germany players (rating x trend x start_prob):")
-    for p, score in top_contributors(germany["players"]):
-        print(f"  {p['id']:<20} rating={p['rating']}  trend={p.get('trend',0):+.1f}  start_prob={p['start_prob']}  contribution={score:.2f}")
-    print("Top contributing Ivory Coast players (rating x trend x start_prob):")
-    for p, score in top_contributors(ivory_coast["players"]):
-        print(f"  {p['id']:<20} rating={p['rating']}  trend={p.get('trend',0):+.1f}  start_prob={p['start_prob']}  contribution={score:.2f}")
-    print()
-
-    conditions_diff = germany["team_record_at_similar_conditions"] - ivory_coast["team_record_at_similar_conditions"]
-    print(f"=== Pitch / conditions ===")
-    print(f"Venue: {venue['venue_name']} | Pitch: {venue['pitch_type']} | "
-          f"Altitude: {venue['altitude_m']}m | Conditions: {venue['expected_conditions']}")
-    print(f"Germany record in similar conditions:     {germany['team_record_at_similar_conditions']:.2f}")
-    print(f"Ivory Coast record in similar conditions: {ivory_coast['team_record_at_similar_conditions']:.2f}")
-    print()
+    h2h_win_rate = h2h["team1_win_rate"] if h2h["matches_found"] > 0 else 0.5
+    h2h_goal_diff = h2h["avg_goal_diff"] if h2h["matches_found"] > 0 else 0.0
 
     row = pd.DataFrame([{
-        "team1_win_rate": germany["win_rate"],
-        "team2_win_rate": ivory_coast["win_rate"],
-        "team1_goals_for_avg": germany["goals_for_avg"],
-        "team2_goals_for_avg": ivory_coast["goals_for_avg"],
-        "team1_goals_against_avg": germany["goals_against_avg"],
-        "team2_goals_against_avg": ivory_coast["goals_against_avg"],
-        "team1_form_points_avg": germany["form_points_avg"],
-        "team2_form_points_avg": ivory_coast["form_points_avg"],
-        "team1_squad_strength": germany_squad_strength,
-        "team2_squad_strength": ivory_coast_squad_strength,
-        "h2h_team1_win_rate": h2h["team1_win_rate"],
-        "h2h_avg_goal_diff": h2h["avg_goal_diff"],
-        "diff_conditions_record": conditions_diff,
+        "team1_win_rate": t1_stats["win_rate"],
+        "team2_win_rate": t2_stats["win_rate"],
+        "team1_goals_for_avg": t1_stats["goals_for_avg"],
+        "team2_goals_for_avg": t2_stats["goals_for_avg"],
+        "team1_goals_against_avg": t1_stats["goals_against_avg"],
+        "team2_goals_against_avg": t2_stats["goals_against_avg"],
+        "team1_form_points_avg": t1_stats["form_points_avg"],
+        "team2_form_points_avg": t2_stats["form_points_avg"],
+        "team1_squad_strength": t1_squad_strength,
+        "team2_squad_strength": t2_squad_strength,
+        "h2h_team1_win_rate": h2h_win_rate,
+        "h2h_avg_goal_diff": h2h_goal_diff,
     }])
     row["diff_win_rate"] = row["team1_win_rate"] - row["team2_win_rate"]
     row["diff_goals_for_avg"] = row["team1_goals_for_avg"] - row["team2_goals_for_avg"]
     row["diff_goals_against_avg"] = row["team1_goals_against_avg"] - row["team2_goals_against_avg"]
     row["diff_form_points"] = row["team1_form_points_avg"] - row["team2_form_points_avg"]
     row["diff_squad_strength"] = row["team1_squad_strength"] - row["team2_squad_strength"]
-
     row = row.reindex(columns=X.columns, fill_value=0)
 
-    _print_prediction("Germany", "Ivory Coast", outcome_model, score_model, row)
+    print(f"Venue: {venue['venue_name']} | Pitch: {venue['pitch_type']} | Conditions: {venue['expected_conditions']}\n")
 
-    backtest(manual_stats)
+    _print_prediction(TEAM1, TEAM2, outcome_model, score_model, row)
+    _backtest(manual_stats, TEAM1, TEAM2)
 
 
-def backtest(manual_stats):
-    """
-    Tests how accurate the model's win/draw/loss CALL would have been on
-    real past Germany vs Ivory Coast matches you've entered in
-    manual_stats.KNOWN_PAST_RESULTS. This directly answers "how accurate
-    does this work" using actual results, not synthetic validation accuracy.
-
-    NOTE: this is a simple sanity check, not a rigorous backtest -- it uses
-    today's squad/form numbers against past scorelines (we don't have
-    historical squad data for each past date in manual mode), so treat it
-    as a rough accuracy gut-check, not a scientific evaluation.
-    """
+def _backtest(manual_stats, team1_name, team2_name):
     results = manual_stats.KNOWN_PAST_RESULTS
     if not results:
         print("=== Backtest ===")
-        print("No KNOWN_PAST_RESULTS filled in manual_stats.py yet -- add a few "
-              "real past Germany vs Ivory Coast results there to test accuracy "
-              "against real outcomes.")
+        print(f"No KNOWN_PAST_RESULTS filled in manual_stats.py -- add a few real past "
+              f"{team1_name} vs {team2_name} results there to sanity-check against the prediction.")
         return
 
-    correct = 0
-    for is_germany_home, germany_goals, ivory_coast_goals in results:
-        if germany_goals > ivory_coast_goals:
-            actual = "Home Win" if is_germany_home else "Away Win"
-        elif germany_goals == ivory_coast_goals:
+    print("=== Backtest (real past results, for sanity-checking) ===")
+    for is_t1_home, t1_goals, t2_goals in results:
+        if t1_goals > t2_goals:
+            actual = "Home Win" if is_t1_home else "Away Win"
+        elif t1_goals == t2_goals:
             actual = "Draw"
         else:
-            actual = "Away Win" if is_germany_home else "Home Win"
-        # NOTE: simplistic -- compares actual outcome label only, since we don't
-        # re-run the model per historical date. Mainly useful once you've got
-        # several results logged to eyeball overall Germany vs Ivory Coast competitiveness.
-        print(f"  Germany {germany_goals}-{ivory_coast_goals} Ivory Coast -> actual: {actual}")
-
-    print(f"\nLogged {len(results)} past result(s) above for manual comparison "
-          f"against the model's predicted Germany/Ivory Coast/Draw probabilities.")
+            actual = "Away Win" if is_t1_home else "Home Win"
+        print(f"  {team1_name} {t1_goals}-{t2_goals} {team2_name} -> actual: {actual}")
 
 
 def run_demo():
+    """Fully synthetic data, no internet needed -- just confirms the code runs."""
     from demo_data import generate_synthetic_dataset
 
-    print("Running in DEMO mode (synthetic data, no API key needed)\n")
+    print("Running in DEMO mode (synthetic data, no internet needed)\n")
 
     X, y_outcome, y_home_goals, y_away_goals = generate_synthetic_dataset()
-
     outcome_model = OutcomeModel().fit(X, y_outcome)
     score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
 
-    # Build a single illustrative "Germany vs Ivory Coast" feature row.
-    # These numbers are PLACEHOLDERS for demo purposes only -- in live mode
-    # these get pulled from the real API for the actual teams.
-    germany_vs_ivory_coast = pd.DataFrame([{
-        "team1_win_rate": 0.65,             # Germany
-        "team2_win_rate": 0.50,             # Ivory Coast
-        "team1_goals_for_avg": 1.6,
-        "team2_goals_for_avg": 1.3,
-        "team1_goals_against_avg": 0.9,
+    belgium_vs_iran = pd.DataFrame([{
+        "team1_win_rate": 0.60,             # Belgium (placeholder for demo only)
+        "team2_win_rate": 0.55,             # Iran
+        "team1_goals_for_avg": 2.0,
+        "team2_goals_for_avg": 1.7,
+        "team1_goals_against_avg": 0.6,
         "team2_goals_against_avg": 1.1,
-        "team1_form_points_avg": 2.0,
-        "team2_form_points_avg": 1.6,
-        "team1_squad_strength": 7.4,
-        "team2_squad_strength": 7.1,
+        "team1_form_points_avg": 2.2,
+        "team2_form_points_avg": 2.0,
+        "team1_squad_strength": 7.6,
+        "team2_squad_strength": 7.0,
     }])
-    germany_vs_ivory_coast["diff_win_rate"] = germany_vs_ivory_coast["team1_win_rate"] - germany_vs_ivory_coast["team2_win_rate"]
-    germany_vs_ivory_coast["diff_goals_for_avg"] = germany_vs_ivory_coast["team1_goals_for_avg"] - germany_vs_ivory_coast["team2_goals_for_avg"]
-    germany_vs_ivory_coast["diff_goals_against_avg"] = germany_vs_ivory_coast["team1_goals_against_avg"] - germany_vs_ivory_coast["team2_goals_against_avg"]
-    germany_vs_ivory_coast["diff_form_points"] = germany_vs_ivory_coast["team1_form_points_avg"] - germany_vs_ivory_coast["team2_form_points_avg"]
-    germany_vs_ivory_coast["diff_squad_strength"] = germany_vs_ivory_coast["team1_squad_strength"] - germany_vs_ivory_coast["team2_squad_strength"]
+    belgium_vs_iran["diff_win_rate"] = belgium_vs_iran["team1_win_rate"] - belgium_vs_iran["team2_win_rate"]
+    belgium_vs_iran["diff_goals_for_avg"] = belgium_vs_iran["team1_goals_for_avg"] - belgium_vs_iran["team2_goals_for_avg"]
+    belgium_vs_iran["diff_goals_against_avg"] = belgium_vs_iran["team1_goals_against_avg"] - belgium_vs_iran["team2_goals_against_avg"]
+    belgium_vs_iran["diff_form_points"] = belgium_vs_iran["team1_form_points_avg"] - belgium_vs_iran["team2_form_points_avg"]
+    belgium_vs_iran["diff_squad_strength"] = belgium_vs_iran["team1_squad_strength"] - belgium_vs_iran["team2_squad_strength"]
 
-    _print_prediction("Germany", "Ivory Coast", outcome_model, score_model, germany_vs_ivory_coast)
-
-
-def run_live():
-    from data_fetcher import (
-        get_team_id, get_team_statistics, get_recent_form,
-        get_head_to_head, get_squad, get_player_statistics,
-        get_fixtures_by_league,
-    )
-    from features import (
-        team_season_features, recent_form_features, head_to_head_features,
-        player_weighted_strength, estimate_start_probability,
-        build_match_feature_row,
-    )
-    from training_data import build_training_dataset
-
-    # FIFA World Cup 2026 = league id 1 on API-Football, confirmed via their
-    # official docs (api-football.com/news/post/fifa-world-cup-2026-guide-to-using-data-with-api-sports)
-    SEASON = 2026
-    LEAGUE_ID = 1
-
-    print("Fetching team IDs...")
-    germany_id, germany_name = get_team_id("Germany")
-    ivory_coast_id, ivory_coast_name = get_team_id("Ivory Coast")
-
-    # --- 1. Build training data from completed World Cup 2026 matches so far ---
-    print(f"Fetching completed fixtures for league={LEAGUE_ID}, season={SEASON}...")
-    fixtures = get_fixtures_by_league(LEAGUE_ID, SEASON, status="FT")
-    print(f"Found {len(fixtures)} completed matches to train on.")
-
-    if len(fixtures) < 15:
-        print("WARNING: very few completed matches available this early in the "
-              "tournament -- the model will be trained on a small sample, so "
-              "treat predictions as rough/directional rather than reliable.\n")
-
-    X, y_outcome, y_home_goals, y_away_goals = build_training_dataset(fixtures, LEAGUE_ID, SEASON)
-
-    # --- 2. Build the live feature row for Germany vs Ivory Coast ---
-    germany_stats = get_team_statistics(germany_id, LEAGUE_ID, SEASON)
-    ivory_coast_stats = get_team_statistics(ivory_coast_id, LEAGUE_ID, SEASON)
-    germany_form = get_recent_form(germany_id, last_n=5)
-    ivory_coast_form = get_recent_form(ivory_coast_id, last_n=5)
-    h2h = get_head_to_head(germany_id, ivory_coast_id, last_n=10)
-
-    germany_feats = {**team_season_features(germany_stats, "team1"),
-                     **recent_form_features(germany_form, germany_id, "team1")}
-    ivory_coast_feats = {**team_season_features(ivory_coast_stats, "team2"),
-                         **recent_form_features(ivory_coast_form, ivory_coast_id, "team2")}
-    h2h_feats = head_to_head_features(h2h, germany_id)
-
-    # --- 3. Player-weighted squad strength ---
-    germany_squad = get_squad(germany_id)
-    ivory_coast_squad = get_squad(ivory_coast_id)
-
-    # TODO: replace with real per-player season ratings + minutes played
-    # via get_player_statistics(player_id, SEASON) for each player, then:
-    #   start_prob = estimate_start_probability(minutes_last5)
-    # For now these dicts are empty, so player_weighted_strength() falls
-    # back to a default average rating -- wire this up for full accuracy.
-    germany_rating_lookup, germany_start_prob_lookup = {}, {}
-    ivory_coast_rating_lookup, ivory_coast_start_prob_lookup = {}, {}
-
-    germany_feats.update(player_weighted_strength(
-        germany_squad, germany_rating_lookup, germany_start_prob_lookup, "team1"))
-    ivory_coast_feats.update(player_weighted_strength(
-        ivory_coast_squad, ivory_coast_rating_lookup, ivory_coast_start_prob_lookup, "team2"))
-
-    venue_feats = {}  # TODO: wire up venue_features() once you have venue history data
-
-    match_row = build_match_feature_row(germany_feats, ivory_coast_feats, h2h_feats, venue_feats)
-    match_row = match_row.fillna(0)
-
-    # --- 4. Train the models on real historical data, then predict ---
-    if len(X) < 10:
-        print("\nNot enough completed matches yet to train a meaningful model "
-              "(need at least ~10-15). Try again closer to/during the tournament "
-              "once more matches have been played, or run --demo to test mechanics.")
-        return
-
-    print("\nTraining models on real historical fixtures...")
-    outcome_model = OutcomeModel().fit(X, y_outcome)
-    score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
-
-    # match_row's columns must match what the models were trained on
-    match_row = match_row.reindex(columns=X.columns, fill_value=0)
-
-    _print_prediction(germany_name, ivory_coast_name, outcome_model, score_model, match_row)
+    _print_prediction("Belgium", "Iran", outcome_model, score_model, belgium_vs_iran)
 
 
 def _print_prediction(team1_name, team2_name, outcome_model, score_model, feature_row):
@@ -301,7 +198,7 @@ def _print_prediction(team1_name, team2_name, outcome_model, score_model, featur
     print(f"Draw probability:              {probs['draw']*100:.1f}%")
     print(f"{team2_name} win probability:  {probs['away_win']*100:.1f}%")
     print(f"\nExpected goals -> {team1_name}: {lam1:.2f}  |  {team2_name}: {lam2:.2f}")
-    print(f"Most likely scoreline: {team1_name} {most_likely['score'].replace('-', f' - ')} {team2_name}  "
+    print(f"Most likely scoreline: {team1_name} {most_likely['score'].replace('-', ' - ')} {team2_name}  "
           f"({most_likely['probability']*100:.1f}% chance)")
     print("\nTop 5 most probable scorelines:")
     for s in top5:
@@ -310,15 +207,10 @@ def _print_prediction(team1_name, team2_name, outcome_model, score_model, featur
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--demo", action="store_true", help="Run with fully synthetic data, no API key needed")
-    parser.add_argument("--manual", action="store_true", help="Run with your hand-entered real stats (manual_stats.py), no API needed")
-    parser.add_argument("--live", action="store_true", help="Run with live API data (needs FOOTBALL_API_KEY)")
+    parser.add_argument("--demo", action="store_true", help="Run with fully synthetic data, no internet needed")
     args = parser.parse_args()
 
     if args.demo:
         run_demo()
-    elif args.live:
-        run_live()
     else:
-        # default: manual mode, since it's the most reliable free option
-        run_manual()
+        run_real()
