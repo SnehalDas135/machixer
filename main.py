@@ -1,14 +1,14 @@
 """
-main.py  (Belgium vs Iran)
+main.py  (Portugal vs Uzbekistan)
 ------------------------------------
-Predicts Belgium vs Iran: win/draw/loss probabilities AND a
+Predicts Portugal vs Uzbekistan: win/draw/loss probabilities AND a
 predicted final scoreline.
 
 RUN MODES
 =========
 1. REAL MODE (default, recommended) -- trains on ~49,000 real international
-   match results (free CSV, no API key, no signup) and pulls Belgium's and
-   Iran's actual current form + head-to-head automatically:
+   match results (free CSV, no API key, no signup) and pulls Portugal's and
+   Uzbekistan's actual current form + head-to-head automatically:
        python3 main.py
 
 2. DEMO MODE -- fully synthetic data, no internet needed at all, just to
@@ -44,7 +44,7 @@ def run_real():
     import manual_stats
     from recency_scoring import compute_squad_strength
 
-    TEAM1, TEAM2 = "Belgium", "Iran"
+    TEAM1, TEAM2 = "Portugal", "Uzbekistan"
 
     print(f"Loading real historical match data for {TEAM1} vs {TEAM2}...")
     df = historical_data.load_results(min_year=2005)
@@ -74,8 +74,8 @@ def run_real():
         print(f"No direct head-to-head matches found in the dataset between {TEAM1} and {TEAM2} "
               f"-- using neutral defaults (0.5 win rate, 0 goal diff).\n")
 
-    g = manual_stats.BELGIUM
-    ic = manual_stats.IRAN
+    g = manual_stats.PORTUGAL
+    ic = manual_stats.UZBEKISTAN
     venue = manual_stats.VENUE
 
     t1_squad_strength, t1_breakdown = compute_squad_strength(g["players"])
@@ -167,25 +167,25 @@ def run_demo():
     outcome_model = OutcomeModel().fit(X, y_outcome)
     score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
 
-    belgium_vs_iran = pd.DataFrame([{
-        "team1_win_rate": 0.60,             # Belgium (placeholder for demo only)
-        "team2_win_rate": 0.55,             # Iran
+    portugal_vs_uzbekistan = pd.DataFrame([{
+        "team1_win_rate": 0.65,             # Portugal (placeholder for demo only)
+        "team2_win_rate": 0.35,             # Uzbekistan
         "team1_goals_for_avg": 2.0,
-        "team2_goals_for_avg": 1.7,
-        "team1_goals_against_avg": 0.6,
-        "team2_goals_against_avg": 1.1,
-        "team1_form_points_avg": 2.2,
-        "team2_form_points_avg": 2.0,
-        "team1_squad_strength": 7.6,
-        "team2_squad_strength": 7.0,
+        "team2_goals_for_avg": 1.0,
+        "team1_goals_against_avg": 0.8,
+        "team2_goals_against_avg": 1.8,
+        "team1_form_points_avg": 2.0,
+        "team2_form_points_avg": 1.0,
+        "team1_squad_strength": 6.6,
+        "team2_squad_strength": 6.4,
     }])
-    belgium_vs_iran["diff_win_rate"] = belgium_vs_iran["team1_win_rate"] - belgium_vs_iran["team2_win_rate"]
-    belgium_vs_iran["diff_goals_for_avg"] = belgium_vs_iran["team1_goals_for_avg"] - belgium_vs_iran["team2_goals_for_avg"]
-    belgium_vs_iran["diff_goals_against_avg"] = belgium_vs_iran["team1_goals_against_avg"] - belgium_vs_iran["team2_goals_against_avg"]
-    belgium_vs_iran["diff_form_points"] = belgium_vs_iran["team1_form_points_avg"] - belgium_vs_iran["team2_form_points_avg"]
-    belgium_vs_iran["diff_squad_strength"] = belgium_vs_iran["team1_squad_strength"] - belgium_vs_iran["team2_squad_strength"]
+    portugal_vs_uzbekistan["diff_win_rate"] = portugal_vs_uzbekistan["team1_win_rate"] - portugal_vs_uzbekistan["team2_win_rate"]
+    portugal_vs_uzbekistan["diff_goals_for_avg"] = portugal_vs_uzbekistan["team1_goals_for_avg"] - portugal_vs_uzbekistan["team2_goals_for_avg"]
+    portugal_vs_uzbekistan["diff_goals_against_avg"] = portugal_vs_uzbekistan["team1_goals_against_avg"] - portugal_vs_uzbekistan["team2_goals_against_avg"]
+    portugal_vs_uzbekistan["diff_form_points"] = portugal_vs_uzbekistan["team1_form_points_avg"] - portugal_vs_uzbekistan["team2_form_points_avg"]
+    portugal_vs_uzbekistan["diff_squad_strength"] = portugal_vs_uzbekistan["team1_squad_strength"] - portugal_vs_uzbekistan["team2_squad_strength"]
 
-    _print_prediction("Belgium", "Iran", outcome_model, score_model, belgium_vs_iran)
+    _print_prediction("Portugal", "Uzbekistan", outcome_model, score_model, portugal_vs_uzbekistan)
 
 
 def _print_prediction(team1_name, team2_name, outcome_model, score_model, feature_row):
