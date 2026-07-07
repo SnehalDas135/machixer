@@ -1,14 +1,14 @@
 """
-main.py  (Switzerland vs Canada)
+main.py  (Argentina vs Egypt)
 ------------------------------------
-Predicts Switzerland vs Canada: win/draw/loss probabilities AND a
+Predicts Argentina vs Egypt: win/draw/loss probabilities AND a
 predicted final scoreline.
 
 RUN MODES
 =========
 1. REAL MODE (default, recommended) -- trains on ~49,000 real international
-   match results (free CSV, no API key, no signup) and pulls Switzerland's
-   and Canada's actual current form + head-to-head automatically:
+   match results (free CSV, no API key, no signup) and pulls Argentina's
+   and Egypt's actual current form + head-to-head automatically:
        python3 main.py
 
 2. DEMO MODE -- fully synthetic data, no internet needed at all, just to
@@ -44,7 +44,7 @@ def run_real():
     import manual_stats
     from recency_scoring import compute_squad_strength
 
-    TEAM1, TEAM2 = "Switzerland", "Canada"
+    TEAM1, TEAM2 = "Argentina", "Egypt"
 
     print(f"Loading real historical match data for {TEAM1} vs {TEAM2}...")
     df = historical_data.load_results(min_year=2005)
@@ -74,8 +74,8 @@ def run_real():
         print(f"No direct head-to-head matches found in the dataset between {TEAM1} and {TEAM2} "
               f"-- using neutral defaults (0.5 win rate, 0 goal diff).\n")
 
-    g = manual_stats.SWITZERLAND
-    ic = manual_stats.CANADA
+    g = manual_stats.ARGENTINA
+    ic = manual_stats.EGYPT
     venue = manual_stats.VENUE
 
     t1_squad_strength, t1_breakdown = compute_squad_strength(g["players"])
@@ -167,25 +167,25 @@ def run_demo():
     outcome_model = OutcomeModel().fit(X, y_outcome)
     score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
 
-    switzerland_vs_canada = pd.DataFrame([{
-        "team1_win_rate": 0.55,             # Switzerland (placeholder for demo only)
-        "team2_win_rate": 0.55,             # Canada
-        "team1_goals_for_avg": 1.8,
-        "team2_goals_for_avg": 2.5,
-        "team1_goals_against_avg": 0.9,
-        "team2_goals_against_avg": 0.5,
-        "team1_form_points_avg": 2.0,
-        "team2_form_points_avg": 2.0,
-        "team1_squad_strength": 6.7,
-        "team2_squad_strength": 6.8,
+    argentina_vs_egypt = pd.DataFrame([{
+        "team1_win_rate": 0.85,             # Argentina (placeholder for demo only)
+        "team2_win_rate": 0.45,             # Egypt
+        "team1_goals_for_avg": 2.75,
+        "team2_goals_for_avg": 1.5,
+        "team1_goals_against_avg": 0.75,
+        "team2_goals_against_avg": 1.0,
+        "team1_form_points_avg": 2.75,
+        "team2_form_points_avg": 1.5,
+        "team1_squad_strength": 8.0,
+        "team2_squad_strength": 6.9,
     }])
-    switzerland_vs_canada["diff_win_rate"] = switzerland_vs_canada["team1_win_rate"] - switzerland_vs_canada["team2_win_rate"]
-    switzerland_vs_canada["diff_goals_for_avg"] = switzerland_vs_canada["team1_goals_for_avg"] - switzerland_vs_canada["team2_goals_for_avg"]
-    switzerland_vs_canada["diff_goals_against_avg"] = switzerland_vs_canada["team1_goals_against_avg"] - switzerland_vs_canada["team2_goals_against_avg"]
-    switzerland_vs_canada["diff_form_points"] = switzerland_vs_canada["team1_form_points_avg"] - switzerland_vs_canada["team2_form_points_avg"]
-    switzerland_vs_canada["diff_squad_strength"] = switzerland_vs_canada["team1_squad_strength"] - switzerland_vs_canada["team2_squad_strength"]
+    argentina_vs_egypt["diff_win_rate"] = argentina_vs_egypt["team1_win_rate"] - argentina_vs_egypt["team2_win_rate"]
+    argentina_vs_egypt["diff_goals_for_avg"] = argentina_vs_egypt["team1_goals_for_avg"] - argentina_vs_egypt["team2_goals_for_avg"]
+    argentina_vs_egypt["diff_goals_against_avg"] = argentina_vs_egypt["team1_goals_against_avg"] - argentina_vs_egypt["team2_goals_against_avg"]
+    argentina_vs_egypt["diff_form_points"] = argentina_vs_egypt["team1_form_points_avg"] - argentina_vs_egypt["team2_form_points_avg"]
+    argentina_vs_egypt["diff_squad_strength"] = argentina_vs_egypt["team1_squad_strength"] - argentina_vs_egypt["team2_squad_strength"]
 
-    _print_prediction("Switzerland", "Canada", outcome_model, score_model, switzerland_vs_canada)
+    _print_prediction("Argentina", "Egypt", outcome_model, score_model, argentina_vs_egypt)
 
 
 def _print_prediction(team1_name, team2_name, outcome_model, score_model, feature_row):
