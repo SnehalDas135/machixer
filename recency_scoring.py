@@ -131,7 +131,7 @@ def compute_squad_strength(players, as_of=None, half_life_days=180):
             "id": p["id"],
             "computed_score": round(score, 2),
             "start_prob": p["start_prob"],
-            "contributin": round(contribution, 2),
+            "contribution": round(contribution, 2),
             "real_data": is_real,
         })
 
