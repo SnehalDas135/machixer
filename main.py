@@ -74,8 +74,8 @@ def run_real():
         print(f"No direct head-to-head matches found in the dataset between {TEAM1} and {TEAM2} "
               f"-- using neutral defaults (0.5 win rate, 0 goal diff).\n")
 
-    g = manual_stats.ARGENTINA
-    ic = manual_stats.EGYPT
+    g = manual_stats.FRANCE
+    ic = manual_stats.MOROCCO
     venue = manual_stats.VENUE
 
     t1_squad_strength, t1_breakdown = compute_squad_strength(g["players"])
