@@ -1,213 +1,177 @@
 """
-manual_stats.py  (Argentina vs Egypt -- FILLED WITH REAL DATA)
+manual_stats.py  (France vs Morocco -- FILLED WITH REAL DATA)
 ------------------------------------------------------------------
-Match: FIFA World Cup 2026, Round of 16
-Date/Time: Tuesday, July 7, 2026, 12:00pm ET
-Venue: Mercedes-Benz Stadium, Atlanta (retractable roof closed / dome)
+Match: FIFA World Cup 2026, Quarter-final (Match 97)
+Date/Time: Thursday, July 9, 2026, 4:00pm ET / 20:00 GMT
+Venue: Boston Stadium (Gillette Stadium), Foxborough, Massachusetts
 
-Sources checked: ESPN, Yahoo Sports, Al Jazeera, FIFA.com, CBS Sports,
-Wikipedia (Group G / Group J pages), Covers.com, worldcuppass.com
+Sources checked: FIFA.com, Al Jazeera, Sports Illustrated, ESPN, Yahoo
+Sports, NBC Boston (match previews, squad news, tournament recaps)
 
 CONTEXT GOING IN:
-- Argentina (defending champions) went 3-0-0 through Group J: beat Algeria
-  3-0 (Messi hat-trick), beat Austria 2-0 (Messi brace, took World Cup
-  all-time scoring record with goals #17 and #18), beat Jordan 3-1 (mostly
-  reserves, Messi scored off the bench). They then needed extra time to
-  beat World Cup debutants Cape Verde 3-2 in the Round of 32 on July 3 --
-  Messi opened the scoring, Cape Verde came back to lead, Lautaro Martinez
-  equalized in extra time, and a late own goal sent Argentina through. This
-  was Argentina's first real scare of the tournament.
-- Messi has scored in every single Argentina game so far (7 goals in 5
-  games, tied for the Golden Boot lead with Mbappe and Haaland), and has
-  now scored in a record 8 straight World Cup matches. He is 38 years old
-  and this is a record 6th World Cup appearance for him.
-- No key injuries reported for Argentina heading into this match (defender
-  Leonardo Balerdi was already out with a pre-tournament injury, but that
-  was factored into squad selection before the tournament started).
-- Egypt finished 2nd in Group G behind Belgium on goal difference, going
-  unbeaten: drew Belgium 1-1 (Emam Ashour scored, later a Mohamed Hany own
-  goal leveled it), beat New Zealand 3-1 (their first ever World Cup win,
-  92 years after their tournament debut -- Ziko, Salah, and Trezeguet all
-  scored), then drew Iran 1-1. In the Round of 32 they needed penalties to
-  beat Australia after a 1-1 draw (Salah scored/converted in the shootout),
-  winning 4-2 on kicks.
-- This is Egypt's first ever World Cup knockout appearance and first ever
-  Round of 16. Mohamed Salah (68 international goals, 2nd all-time for
-  Egypt) is captain and is playing what is likely his final World Cup;
-  Emam Ashour has been the breakout star with 2 goals; Omar Marmoush gives
-  them a second attacking outlet.
-- Egypt center-back Yasser Ibrahim is ruled OUT for this match.
-- Argentina are heavy favorites (around -250 moneyline / historic pedigree)
-  but Egypt have shown they can grind out results and are dangerous on the
-  counter through Salah and Ziko out wide.
-- Mercedes-Benz Stadium's retractable roof is kept closed (dome), so
-  conditions are fully controlled/indoor regardless of Atlanta's summer
-  heat and humidity outside.
+- France are the only team left in the tournament to have won all 5 of
+  their matches without needing extra time: Group I (beat Senegal 3-1,
+  Iraq 3-0, Norway 4-1 -- a Dembele hat-trick plus a Doue strike in that
+  finale), then a dominant 3-0 Round of 32 win over Sweden (Barcola on the
+  scoresheet), then a gritty 1-0 Round of 16 win over Paraguay via an
+  Mbappe penalty. 14 goals scored, only 2 conceded across the tournament.
+- Kylian Mbappe has 7 goals in 5 games, tied for 2nd in the Golden Boot
+  race with Erling Haaland (one behind Messi). He is fit and expected to
+  start as usual.
+- Morocco are the first African nation to reach the quarterfinals in
+  back-to-back World Cups. Their run: drew Brazil 1-1 in the opener,
+  beat Scotland 1-0 (Saibari), beat Haiti 4-2, then needed a dramatic
+  late Issa Diop header to force extra time against the Netherlands in
+  the Round of 32 before winning on penalties, and beat Canada 3-0 in the
+  Round of 16 (an Azzedine Ounahi brace plus a late Soufiane Rahimi
+  stoppage-time strike). Unbeaten in 34 games since their last defeat in
+  August 2025.
+- Morocco's talisman and tournament top scorer Ismael Saibari (3 goals)
+  went off with a hamstring injury after 22 minutes of the Round of 16
+  win over Canada and has been ruled OUT of this quarterfinal -- a major
+  blow. Veteran striker Soufiane Rahimi is expected to start in his place.
+- Morocco captain Achraf Hakimi, center-backs Issa Diop and Redouane
+  Halhal, and playmaker Bilal El Khannouss are all one yellow card away
+  from a suspension that would rule them out of a potential semifinal.
+- Brahim Diaz has been Morocco's most creative outlet all tournament
+  (most goal contributions of any Morocco player since January).
+- Head-to-head: the sides have met 6 times, France winning 4 with 2
+  draws. Their last meeting was the December 2022 World Cup semifinal,
+  which France won 2-0 (Theo Hernandez, Randal Kolo Muani).
+- Boston Stadium (Gillette Stadium) is an open-air stadium; conditions
+  are outdoor grass, no roof.
 
-NOTE ON TEAM NAME: historical_data.py's dataset should match "Argentina"
-and "Egypt" directly.
+NOTE ON TEAM NAME: historical_data.py's dataset should match "France"
+and "Morocco" directly.
 """
 
-ARGENTINA = {
-    # 4 wins, 0 losses so far this tournament (3-0-0 group, W in R32 AET);
-    # defending champions, deepest and most experienced squad in the draw
-    "win_rate": 0.85,
-    "goals_for_avg": 2.75,       # (3+2+3+3) / 4 games
-    "goals_against_avg": 0.75,  # (0+0+1+2) / 4 games
-    "form_points_avg": 2.75,
+FRANCE = {
+    # Perfect 5-0-0 record, no extra time needed in any match; deepest,
+    # most in-form squad left in the tournament
+    "win_rate": 1.0,
+    "goals_for_avg": 2.8,        # 14 goals / 5 games
+    "goals_against_avg": 0.4,    # 2 goals against / 5 games
+    "form_points_avg": 3.0,
 
     "players": [
-        {"id": "Emiliano Martinez",     "start_prob": 0.95, "events": []},
-        {"id": "Nahuel Molina",         "start_prob": 0.7,  "events": []},
-        {"id": "Cristian Romero",       "start_prob": 0.85, "events": []},
-        {"id": "Nicolas Otamendi",      "start_prob": 0.75, "events": []},
-        {"id": "Nicolas Tagliafico",    "start_prob": 0.6,  "events": []},
+        {"id": "Mike Maignan",          "start_prob": 0.95, "events": []},
+        {"id": "Jules Kounde",          "start_prob": 0.85, "events": []},
+        {"id": "Dayot Upamecano",       "start_prob": 0.85, "events": []},
+        {"id": "William Saliba",        "start_prob": 0.9,  "events": []},
+        {"id": "Theo Hernandez",        "start_prob": 0.75, "events": []},
+        {"id": "Mangala Kone",          "start_prob": 0.6,  "events": []},
+        {"id": "Adrien Rabiot",         "start_prob": 0.8,  "events": []},
         {
-            "id": "Enzo Fernandez", "start_prob": 0.85,
-            "events": [],
-        },
-        {
-            "id": "Rodrigo De Paul", "start_prob": 0.85,
-            "events": [],
-        },
-        {
-            "id": "Alexis Mac Allister", "start_prob": 0.85,
-            "events": [],
-        },
-        {
-            "id": "Julian Alvarez", "start_prob": 0.85,
+            "id": "Ousmane Dembele", "start_prob": 0.85,
             "events": [
-                {"date": "2026-06-16", "type": "rating", "value": 7.6},  # active vs Algeria
+                {"date": "2026-06-27", "type": "goal"},   # hat-trick #1 vs Norway
+                {"date": "2026-06-27", "type": "goal"},   # hat-trick #2 vs Norway
+                {"date": "2026-06-27", "type": "goal"},   # hat-trick #3 vs Norway
+                {"date": "2026-06-27", "type": "rating", "value": 9.0},
+            ],
+        },
+        {"id": "Michael Olise",         "start_prob": 0.8,  "events": []},
+        {
+            "id": "Bradley Barcola", "start_prob": 0.65,
+            "events": [
+                {"date": "2026-07-01", "type": "goal"},   # vs Sweden, R32
             ],
         },
         {
-            "id": "Lautaro Martinez", "start_prob": 0.8,
+            "id": "Kylian Mbappe", "start_prob": 0.95,
             "events": [
-                {"date": "2026-06-27", "type": "goal"},   # vs Jordan, group finale
-                {"date": "2026-07-03", "type": "goal"},   # extra-time equalizer vs Cape Verde
-                {"date": "2026-07-03", "type": "rating", "value": 8.0},
+                {"date": "2026-06-16", "type": "goal"},   # vs Senegal, group
+                {"date": "2026-06-21", "type": "goal"},   # vs Iraq, group
+                {"date": "2026-06-27", "type": "goal"},   # vs Norway, group
+                {"date": "2026-07-01", "type": "goal"},   # vs Sweden, R32
+                {"date": "2026-07-05", "type": "goal"},   # penalty winner vs Paraguay, R16
+                {"date": "2026-07-05", "type": "rating", "value": 8.5},
             ],
         },
         {
-            "id": "Lionel Messi", "start_prob": 0.9,
+            "id": "Desire Doue", "start_prob": 0.5,
             "events": [
-                {"date": "2026-06-16", "type": "goal"},   # hat-trick #1 vs Algeria
-                {"date": "2026-06-16", "type": "goal"},   # hat-trick #2 vs Algeria
-                {"date": "2026-06-16", "type": "goal"},   # hat-trick #3 vs Algeria
-                {"date": "2026-06-22", "type": "goal"},   # brace #1 vs Austria (WC record goal #17)
-                {"date": "2026-06-22", "type": "goal"},   # brace #2 vs Austria (WC record goal #18)
-                {"date": "2026-06-27", "type": "goal"},   # free-kick off the bench vs Jordan
-                {"date": "2026-07-03", "type": "goal"},   # opener vs Cape Verde
-                {"date": "2026-07-03", "type": "rating", "value": 8.8},
+                {"date": "2026-06-27", "type": "goal"},   # vs Norway, group finale
             ],
         },
-        {
-            "id": "Giovani Lo Celso", "start_prob": 0.55,
-            "events": [
-                {"date": "2026-06-27", "type": "goal"},   # free-kick vs Jordan
-            ],
-        },
-        {"id": "Leandro Paredes",       "start_prob": 0.4,  "events": []},
-        {"id": "Angel Di Maria",        "start_prob": 0.35, "events": []},
-        {
-            "id": "Leonardo Balerdi", "start_prob": 0.0,   # pre-tournament injury, out
-            "events": [
-                {"date": "2026-06-01", "type": "injury_or_out"},
-            ],
-        },
+        {"id": "Lucas Digne",           "start_prob": 0.55, "events": []},
     ],
 
-    # No dome/indoor experience factor needed -- Argentina comfortable in
-    # varied conditions across the tournament so far
-    "team_record_at_similar_conditions": 0.6,
+    "team_record_at_similar_conditions": 0.65,
 }
 
-EGYPT = {
-    # Unbeaten through 3 group games (1W-2D), then a penalty-shootout win
-    # in the Round of 32 -- resilient but has needed shootouts/late goals
-    "win_rate": 0.45,
-    "goals_for_avg": 1.5,        # (1+3+1+1) / 4 games
-    "goals_against_avg": 1.0,    # (1+1+1+1) / 4 games
-    "form_points_avg": 1.5,
+MOROCCO = {
+    # 3 wins, 2 draws, 0 losses -- resilient, needed penalties once, but
+    # unbeaten in 34 games dating back to August 2025
+    "win_rate": 0.6,
+    "goals_for_avg": 2.0,        # 10 goals / 5 games
+    "goals_against_avg": 0.8,    # 4 goals against / 5 games
+    "form_points_avg": 2.2,
 
     "players": [
-        {"id": "Mostafa Shoubir",       "start_prob": 0.9,  "events": []},
-        {"id": "Mohamed Hany",          "start_prob": 0.7,
-         "events": [
-             {"date": "2026-06-15", "type": "injury_or_out"},   # own goal vs Belgium (negative event proxy)
-         ]},
+        {"id": "Yassine Bounou",        "start_prob": 0.9,  "events": []},
+        {"id": "Achraf Hakimi",         "start_prob": 0.9,  "events": []},  # captain, one yellow from suspension
         {
-            "id": "Yasser Ibrahim", "start_prob": 0.0,   # ruled OUT for this match
+            "id": "Issa Diop", "start_prob": 0.8,
             "events": [
-                {"date": "2026-07-06", "type": "injury_or_out"},
+                {"date": "2026-07-04", "type": "goal"},   # dramatic late equalizer vs Netherlands, R32
             ],
         },
-        {"id": "Ahmed Hegazy",          "start_prob": 0.75, "events": []},
-        {"id": "Rami Rabia",            "start_prob": 0.6,  "events": []},
+        {"id": "Redouane Halhal",       "start_prob": 0.7,  "events": []},
+        {"id": "Noussair Mazraoui",     "start_prob": 0.75, "events": []},
         {
-            "id": "Emam Ashour", "start_prob": 0.85,
+            "id": "Azzedine Ounahi", "start_prob": 0.75,
             "events": [
-                {"date": "2026-06-15", "type": "goal"},   # 20-yard opener vs Belgium
-                {"date": "2026-07-03", "type": "goal"},   # header vs Australia
-                {"date": "2026-07-03", "type": "rating", "value": 8.1},
+                {"date": "2026-07-04", "type": "goal"},   # brace #1 vs Canada, R16
+                {"date": "2026-07-04", "type": "goal"},   # brace #2 vs Canada, R16
+                {"date": "2026-07-04", "type": "rating", "value": 8.4},
             ],
         },
-        {"id": "Mohamed Elneny",        "start_prob": 0.65, "events": []},
+        {"id": "Sofyan Amrabat",        "start_prob": 0.6,  "events": []},
+        {"id": "Bilal El Khannouss",    "start_prob": 0.75, "events": []},  # one yellow from suspension
         {
-            "id": "Mostafa Mohamed", "start_prob": 0.5,
-            "events": [],
-        },
-        {
-            "id": "Omar Marmoush", "start_prob": 0.8,
+            "id": "Brahim Diaz", "start_prob": 0.85,
             "events": [
-                {"date": "2026-06-26", "type": "rating", "value": 7.3},  # vs Iran
+                {"date": "2026-07-04", "type": "rating", "value": 8.0},  # tournament's most creative player
             ],
         },
         {
-            "id": "Mostafa Ziko", "start_prob": 0.7,
+            "id": "Ismael Saibari", "start_prob": 0.0,   # hamstring injury, ruled OUT for this match
             "events": [
-                {"date": "2026-06-21", "type": "goal"},   # turnaround goal vs New Zealand
-                {"date": "2026-07-07", "type": "rating", "value": 7.8},  # decisive vs Argentina today
+                {"date": "2026-06-15", "type": "goal"},   # opener vs Brazil, group
+                {"date": "2026-06-20", "type": "goal"},   # winner vs Scotland, group
+                {"date": "2026-06-24", "type": "goal"},   # tying goal vs Haiti, group
+                {"date": "2026-07-04", "type": "injury_or_out"},  # hamstring, off after 22' vs Canada
             ],
         },
         {
-            "id": "Mohamed Salah", "start_prob": 0.95,
+            "id": "Soufiane Rahimi", "start_prob": 0.75,   # expected to start in Saibari's place
             "events": [
-                {"date": "2026-06-21", "type": "goal"},   # vs New Zealand, oldest-ever Egypt WC scorer
-                {"date": "2026-07-03", "type": "goal"},   # penalty converted in shootout win over Australia
-                {"date": "2026-07-03", "type": "rating", "value": 7.9},
-            ],
-        },
-        {
-            "id": "Trezeguet", "start_prob": 0.55,
-            "events": [
-                {"date": "2026-06-21", "type": "goal"},   # sealed the New Zealand win late
+                {"date": "2026-07-04", "type": "goal"},   # late stoppage-time strike vs Canada, R16
             ],
         },
     ],
 
-    # Playing in a closed-roof dome (Mercedes-Benz Stadium) -- neutral,
-    # fully controlled conditions, no strong home/away climate edge either way
     "team_record_at_similar_conditions": 0.5,
 }
 
-# No prior competitive Argentina vs Egypt meetings found in the historical
-# record -- treated as neutral/unknown rather than guessed.
+# Real head-to-head record found: 6 meetings, France 4 wins, 2 draws, 0
+# Morocco wins. Most recent: Dec 2022 WC semifinal, France won 2-0.
 HEAD_TO_HEAD = {
-    "team1_win_rate": 0.5,
-    "avg_goal_diff": 0.0,
+    "team1_win_rate": 0.67,   # 4 wins out of 6 for France
+    "avg_goal_diff": 0.5,     # France have generally shaded these narrowly
 }
 
 VENUE = {
-    "venue_name": "Mercedes-Benz Stadium, Atlanta, USA",
-    "pitch_type": "natural grass (retractable-roof stadium, grass grown/maintained for "
-                   "World Cup play)",
-    "altitude_m": 320,
-    "expected_conditions": "Retractable roof kept closed (dome) for this match -- fully "
-                            "controlled indoor conditions regardless of Atlanta's summer "
-                            "heat/humidity outside",
+    "venue_name": "Boston Stadium (Gillette Stadium), Foxborough, Massachusetts",
+    "pitch_type": "natural grass, open-air stadium",
+    "altitude_m": 40,
+    "expected_conditions": "Outdoor, no roof -- typical New England early-July evening "
+                            "conditions, mild and dry",
 }
 
-# No confirmed past Argentina vs Egypt results found -- nothing to
-# backtest against for this specific fixture.
-KNOWN_PAST_RESULTS = []
+# Real past France vs Morocco results for backtesting (most recent meeting)
+KNOWN_PAST_RESULTS = [
+    # (is_team1_home, team1_goals, team2_goals) -- team1=France, team2=Morocco
+    (True, 2, 0),   # Dec 14, 2022 -- World Cup semifinal (neutral venue, France as team1)
+]
