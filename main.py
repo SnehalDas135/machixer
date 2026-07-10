@@ -1,14 +1,14 @@
 """
-main.py  (France vs Morocco)
+main.py  (Spain vs Belgium)
 ------------------------------------
-Predicts France vs Morocco: win/draw/loss probabilities AND a
+Predicts Spain vs Belgium: win/draw/loss probabilities AND a
 predicted final scoreline.
 
 RUN MODES
 =========
 1. REAL MODE (default, recommended) -- trains on ~49,000 real international
-   match results (free CSV, no API key, no signup) and pulls France's
-   and Morocco's actual current form + head-to-head automatically:
+   match results (free CSV, no API key, no signup) and pulls Spain's
+   and Belgium's actual current form + head-to-head automatically:
        python3 main.py
 
 2. DEMO MODE -- fully synthetic data, no internet needed at all, just to
@@ -44,7 +44,7 @@ def run_real():
     import manual_stats
     from recency_scoring import compute_squad_strength
 
-    TEAM1, TEAM2 = "France", "Morocco"
+    TEAM1, TEAM2 = "Spain", "Belgium"
 
     print(f"Loading real historical match data for {TEAM1} vs {TEAM2}...")
     df = historical_data.load_results(min_year=2005)
@@ -74,8 +74,8 @@ def run_real():
         print(f"No direct head-to-head matches found in the dataset between {TEAM1} and {TEAM2} "
               f"-- using neutral defaults (0.5 win rate, 0 goal diff).\n")
 
-    g = manual_stats.FRANCE
-    ic = manual_stats.MOROCCO
+    g = manual_stats.SPAIN
+    ic = manual_stats.BELGIUM
     venue = manual_stats.VENUE
 
     t1_squad_strength, t1_breakdown = compute_squad_strength(g["players"])
@@ -167,25 +167,25 @@ def run_demo():
     outcome_model = OutcomeModel().fit(X, y_outcome)
     score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
 
-    france_vs_morocco = pd.DataFrame([{
-        "team1_win_rate": 1.0,               # France (placeholder for demo only)
-        "team2_win_rate": 0.6,               # Morocco
-        "team1_goals_for_avg": 2.8,
-        "team2_goals_for_avg": 2.0,
-        "team1_goals_against_avg": 0.4,
-        "team2_goals_against_avg": 0.8,
-        "team1_form_points_avg": 3.0,
+    spain_vs_belgium = pd.DataFrame([{
+        "team1_win_rate": 0.8,                # Spain (placeholder for demo only)
+        "team2_win_rate": 0.4,                # Belgium
+        "team1_goals_for_avg": 1.8,
+        "team2_goals_for_avg": 2.6,
+        "team1_goals_against_avg": 0.0,
+        "team2_goals_against_avg": 1.0,
+        "team1_form_points_avg": 2.6,
         "team2_form_points_avg": 2.2,
-        "team1_squad_strength": 8.3,
-        "team2_squad_strength": 7.4,
+        "team1_squad_strength": 8.0,
+        "team2_squad_strength": 7.6,
     }])
-    france_vs_morocco["diff_win_rate"] = france_vs_morocco["team1_win_rate"] - france_vs_morocco["team2_win_rate"]
-    france_vs_morocco["diff_goals_for_avg"] = france_vs_morocco["team1_goals_for_avg"] - france_vs_morocco["team2_goals_for_avg"]
-    france_vs_morocco["diff_goals_against_avg"] = france_vs_morocco["team1_goals_against_avg"] - france_vs_morocco["team2_goals_against_avg"]
-    france_vs_morocco["diff_form_points"] = france_vs_morocco["team1_form_points_avg"] - france_vs_morocco["team2_form_points_avg"]
-    france_vs_morocco["diff_squad_strength"] = france_vs_morocco["team1_squad_strength"] - france_vs_morocco["team2_squad_strength"]
+    spain_vs_belgium["diff_win_rate"] = spain_vs_belgium["team1_win_rate"] - spain_vs_belgium["team2_win_rate"]
+    spain_vs_belgium["diff_goals_for_avg"] = spain_vs_belgium["team1_goals_for_avg"] - spain_vs_belgium["team2_goals_for_avg"]
+    spain_vs_belgium["diff_goals_against_avg"] = spain_vs_belgium["team1_goals_against_avg"] - spain_vs_belgium["team2_goals_against_avg"]
+    spain_vs_belgium["diff_form_points"] = spain_vs_belgium["team1_form_points_avg"] - spain_vs_belgium["team2_form_points_avg"]
+    spain_vs_belgium["diff_squad_strength"] = spain_vs_belgium["team1_squad_strength"] - spain_vs_belgium["team2_squad_strength"]
 
-    _print_prediction("France", "Morocco", outcome_model, score_model, france_vs_morocco)
+    _print_prediction("Spain", "Belgium", outcome_model, score_model, spain_vs_belgium)
 
 
 def _print_prediction(team1_name, team2_name, outcome_model, score_model, feature_row):
