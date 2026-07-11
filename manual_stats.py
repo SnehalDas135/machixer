@@ -1,182 +1,106 @@
 """
-manual_stats.py  (Spain vs Belgium -- FILLED WITH REAL DATA)
+manual_stats.py  (Norway vs England -- FILLED WITH REAL DATA)
 ------------------------------------------------------------------
-Match: FIFA World Cup 2026, Quarter-final (Match 98)
-Date/Time: Friday, July 10, 2026, 3:00pm ET / 12:00pm PT / 19:00 GMT
-Venue: Los Angeles Stadium / SoFi Stadium, Inglewood, California
+Match: FIFA World Cup 2026, Quarter-final (Match 99)
+Date/Time: Saturday, July 11, 2026, 5:00pm ET / 10:00pm BST / 21:00 GMT
+Venue: Hard Rock Stadium, Miami Gardens, Florida
 
-Sources checked: ESPN, Goal.com, FIFA.com, Yahoo Sports, Olympics.com
-(match previews, group stage recaps, head-to-head history)
+Sources checked: FIFA.com, Sky Sports, ESPN, Sports Mole, SI.com,
+Bolavip, Tips.gg, englandfootball.com (match previews, group stage
+recaps, head-to-head history)
 
 CONTEXT GOING IN:
-- Spain are the form team of the tournament defensively: unbeaten in 5
-  games and have NOT conceded a single goal all World Cup (goalkeeper
-  Unai Simon has set a new record of 609 minutes without being breached).
-  Their run: shocking 0-0 draw with debutants Cape Verde in the opener,
-  4-0 win over Saudi Arabia, 1-0 win over Uruguay (a Muslera own-goal
-  off an Alex Baena shot) to top Group H, then a dominant 3-0 Round of 32
-  win over Austria, and a 1-0 Round of 16 win over Portugal via a
-  stoppage-time Mikel Merino winner that sent Cristiano Ronaldo out of
-  his final World Cup. Mikel Oyarzabal leads the team with 4 tournament
-  goals; Lamine Yamal and Merino have 1 each.
-- Belgium have been the tournament's form team going forward as the
-  knockouts have progressed, despite a shaky start: draws with Egypt
-  (1-1) and Iran (0-0) in the group, then a 5-1 rout of New Zealand to
-  win Group G. In the knockouts they needed extra time to beat Senegal
-  3-2 in the Round of 32 (coming back from 2-0 down), then produced their
-  best performance of the tournament, hammering co-hosts USA 4-1 in the
-  Round of 16 (a Charles De Ketelaere brace, plus goals from Lukaku and
-  Hans Vanaken). Romelu Lukaku has 3 goals this tournament and his World
-  Cup career tally (8) is now level with Diego Maradona, Rudi Voller and
-  Rivaldo for goals scored across tournaments.
-- Belgium suffered a big blow in the Round of 16 win over USA: midfield
-  anchor Amadou Onana suffered an ACL injury and has been ruled OUT for
-  the rest of the tournament (and months beyond), a serious loss for
-  their defensive midfield structure. Youri Tielemans and Nicolas Raskin
-  are expected to shoulder that extra defensive responsibility.
-- No injury concerns reported for Spain heading into this game.
-- This is a rematch of the famous 1986 World Cup quarterfinal, which
-  Belgium won on penalties -- their only all-time World Cup win over
-  Spain. Spain got revenge in the 1990 group stage. In more recent
-  meetings (2008-2016, mostly friendlies/qualifiers), Spain have won all
-  5, scoring 11 goals and conceding just 1.
-- Los Angeles Stadium (SoFi Stadium) is an indoor, climate-controlled
-  venue -- consistent conditions regardless of Southern California
-  weather outside.
+- This is the first-ever meeting between Norway and England at a World
+  Cup finals, despite 11 prior meetings in friendlies and qualifiers
+  dating back to 1937. England lead the all-time head-to-head 6W-3D-2L,
+  scoring 24 goals and conceding just 7, and are unbeaten in the last 4
+  meetings since 1993 (two 0-0 draws, then 1-0 wins in 2012 and 2014),
+  with Norway failing to score in any of those last 4 games.
+- Norway are the surprise package of the tournament, reaching a World
+  Cup quarterfinal for the first time in their history. Group stage:
+  beat Iraq 4-1, beat Senegal 3-2, then lost 4-1 to France (with Haaland
+  rested) but still topped through to the knockouts. They then won their
+  first-ever World Cup knockout match, 2-1 over Ivory Coast (an
+  86th-minute Haaland winner), and followed it with a stunning 2-1 upset
+  of five-time champions Brazil in the Round of 16, Haaland scoring a
+  brace. He has scored in each of his last 14 competitive Norway matches
+  (27 goals in that run) and has found the net in all 4 of his World Cup
+  appearances so far (rested for the France loss).
+- England topped Group L: beat Croatia 4-2 (Kane brace, Bellingham),
+  drew 0-0 with Ghana, beat Panama 2-0 (Bellingham + Kane, Kane's goal
+  made him England's all-time leading World Cup scorer with 11, passing
+  Gary Lineker). Round of 32: beat DR Congo 2-1. Round of 16: beat Mexico
+  3-2 (a Bellingham brace plus a Kane penalty), surviving a second-half
+  red card to right-back Jarell Quansah.
+- Jarell Quansah's red card has been elevated to a two-match suspension,
+  ruling him OUT of this quarterfinal (and the semifinal if England
+  advance). Marc Guehi and Declan Rice both carried minor fitness doubts
+  into the game but have since trained fully and are expected to start.
+- Norway are reportedly set to bring on Jesper Karlsson/Antonio Nusa-type
+  width with Andreas Schjelderup coming into the side, with striker
+  Alexander Sorloth dropping among the substitutes in the predicted XI.
+- Hard Rock Stadium is an open-air stadium with a partial canopy roof
+  covering most seating areas but an open pitch -- expect hot, humid
+  Miami conditions in July.
 
-NOTE ON TEAM NAME: historical_data.py's dataset should match "Spain"
-and "Belgium" directly.
+NOTE ON TEAM NAME: historical_data.py's dataset should match "Norway"
+and "England" directly.
 """
 
-SPAIN = {
-    # 4 wins, 1 draw, 0 losses; the only team at this World Cup yet to
-    # concede a goal (5 clean sheets in 5 games)
+NORWAY = {
+    # 4 wins, 0 draws, 1 loss (to France, with Haaland rested); first
+    # ever World Cup quarterfinal in Norway's history
     "win_rate": 0.8,
-    "goals_for_avg": 1.8,        # 9 goals / 5 games
-    "goals_against_avg": 0.0,    # 0 goals against / 5 games -- a real record
-    "form_points_avg": 2.6,
+    "goals_for_avg": 2.4,        # 12 goals / 5 games
+    "goals_against_avg": 1.8,    # 9 goals against / 5 games
+    "form_points_avg": 2.4,
 
     "players": [
+        {"id": "Orjan Nyland",          "start_prob": 0.9,  "events": []},
+        {"id": "Torbjorn Heggem",       "start_prob": 0.8,  "events": []},
+        {"id": "Kristoffer Ajer",       "start_prob": 0.85, "events": []},
+        {"id": "Leo Ostigard",          "start_prob": 0.8,  "events": []},
+        {"id": "Julian Ryerson",        "start_prob": 0.75, "events": []},
         {
-            "id": "Unai Simon", "start_prob": 0.95,
+            "id": "Martin Odegaard", "start_prob": 0.9,   # captain
             "events": [
-                {"date": "2026-07-06", "type": "rating", "value": 8.0},  # 609-minute clean sheet record
+                {"date": "2026-06-30", "type": "assist"},   # 3rd straight match with an assist, vs Ivory Coast
             ],
         },
-        {"id": "Pedro Porro",           "start_prob": 0.85, "events": []},
-        {"id": "Pau Cubarsi",           "start_prob": 0.85, "events": []},
-        {"id": "Aymeric Laporte",       "start_prob": 0.85, "events": []},
+        {"id": "Sander Berge",          "start_prob": 0.8,
+         "events": [
+             {"date": "2026-06-30", "type": "assist"},   # set up Haaland's winner vs Ivory Coast
+         ]},
+        {"id": "Patrick Berg",          "start_prob": 0.75, "events": []},
         {
-            "id": "Marc Cucurella", "start_prob": 0.85,
+            "id": "Antonio Nusa", "start_prob": 0.8,
             "events": [
-                {"date": "2026-07-06", "type": "assist"},   # assist vs Portugal, R16
-            ],
-        },
-        {"id": "Pedri",                 "start_prob": 0.9,  "events": []},
-        {"id": "Rodri",                 "start_prob": 0.9,  "events": []},   # 2024 Ballon d'Or winner, deep pivot anchor
-        {
-            "id": "Lamine Yamal", "start_prob": 0.9,
-            "events": [
-                {"date": "2026-06-21", "type": "goal"},   # vs Saudi Arabia, group
-                {"date": "2026-07-02", "type": "rating", "value": 8.1},
-            ],
-        },
-        {"id": "Dani Olmo",             "start_prob": 0.8,  "events": []},
-        {
-            "id": "Alex Baena", "start_prob": 0.6,
-            "events": [
-                {"date": "2026-06-26", "type": "assist"},   # shot that led to the Uruguay own goal
+                {"date": "2026-06-30", "type": "goal"},   # curling opener vs Ivory Coast
+                {"date": "2026-06-30", "type": "rating", "value": 7.9},
             ],
         },
         {
-            "id": "Mikel Oyarzabal", "start_prob": 0.85,
-            "events": [
-                {"date": "2026-06-15", "type": "rating", "value": 7.4},  # tested vs Cape Verde
-                {"date": "2026-07-02", "type": "goal"},
-                {"date": "2026-06-21", "type": "goal"},
-                {"date": "2026-06-26", "type": "goal"},
-                {"date": "2026-06-15", "type": "goal"},   # 4 tournament goals across group + R32
-            ],
-        },
-        {
-            "id": "Mikel Merino", "start_prob": 0.55,
-            "events": [
-                {"date": "2026-07-06", "type": "goal"},   # stoppage-time winner vs Portugal, R16
-                {"date": "2026-07-06", "type": "rating", "value": 8.3},
-            ],
-        },
-    ],
-
-    "team_record_at_similar_conditions": 0.6,
-}
-
-BELGIUM = {
-    # 2 wins, 2 draws, 0 losses; slow start but the tournament's most
-    # dangerous attacking side over the last 3 matches (3+ goals in each)
-    "win_rate": 0.4,
-    "goals_for_avg": 2.6,        # 13 goals / 5 games
-    "goals_against_avg": 1.0,    # 5 goals against / 5 games
-    "form_points_avg": 2.2,
-
-    "players": [
-        {"id": "Thibaut Courtois",      "start_prob": 0.95, "events": []},
-        {"id": "Timothy Castagne",      "start_prob": 0.8,  "events": []},
-        {"id": "Nathan Ngoy",           "start_prob": 0.75, "events": []},
-        {"id": "Brandon Mechele",       "start_prob": 0.7,  "events": []},
-        {"id": "Maxim De Cuyper",       "start_prob": 0.7,  "events": []},
-        {
-            "id": "Hans Vanaken", "start_prob": 0.85,
-            "events": [
-                {"date": "2026-07-06", "type": "goal"},   # vs USA, R16
-                {"date": "2026-07-06", "type": "assist"},
-            ],
-        },
-        {
-            "id": "Nicolas Raskin", "start_prob": 0.75,
-            "events": [
-                {"date": "2026-07-06", "type": "assist"},
-            ],
-        },
-        {"id": "Dodi Lukebakio",        "start_prob": 0.6,  "events": []},
-        {
-            "id": "Youri Tielemans", "start_prob": 0.85,
-            "events": [
-                {"date": "2026-07-01", "type": "goal"},   # extra-time strike vs Senegal, R32
-                {"date": "2026-06-26", "type": "goal"},   # vs New Zealand, group finale
-            ],
-        },
-        {
-            "id": "Leandro Trossard", "start_prob": 0.85,
-            "events": [
-                {"date": "2026-06-26", "type": "goal"},   # vs New Zealand
-                {"date": "2026-07-01", "type": "goal"},   # vs Senegal, R32
-                {"date": "2026-06-26", "type": "assist"},
-            ],
-        },
-        {
-            "id": "Charles De Ketelaere", "start_prob": 0.8,
-            "events": [
-                {"date": "2026-07-06", "type": "goal"},   # brace #1 vs USA, R16
-                {"date": "2026-07-06", "type": "goal"},   # brace #2 vs USA, R16
-                {"date": "2026-07-06", "type": "rating", "value": 8.7},
-            ],
-        },
-        {
-            "id": "Romelu Lukaku", "start_prob": 0.85,
-            "events": [
-                {"date": "2026-06-26", "type": "goal"},   # decisive vs New Zealand
-                {"date": "2026-07-01", "type": "goal"},   # extra-time winner vs Senegal
-                {"date": "2026-07-06", "type": "goal"},   # vs USA, R16 -- 8th career WC goal
-            ],
-        },
-        {
-            "id": "Kevin De Bruyne", "start_prob": 0.6,   # creative reference point, likely impact sub/starter
+            "id": "Andreas Schjelderup", "start_prob": 0.55,   # tipped to come into the starting XI
             "events": [],
         },
         {
-            "id": "Amadou Onana", "start_prob": 0.0,   # ACL injury vs USA, ruled OUT for rest of tournament
+            "id": "Oscar Bobb", "start_prob": 0.55,
             "events": [
-                {"date": "2026-07-06", "type": "injury_or_out"},
+                {"date": "2026-06-30", "type": "assist"},   # assist in the Haaland winner build-up
+            ],
+        },
+        {
+            "id": "Alexander Sorloth", "start_prob": 0.35,   # reportedly dropping out of the XI
+            "events": [],
+        },
+        {
+            "id": "Erling Haaland", "start_prob": 0.95,
+            "events": [
+                {"date": "2026-06-16", "type": "goal"},   # vs Iraq, group
+                {"date": "2026-06-22", "type": "goal"},   # vs Senegal, group
+                {"date": "2026-06-30", "type": "goal"},   # 86th-min winner vs Ivory Coast, R32
+                {"date": "2026-07-05", "type": "goal"},   # brace game-winner vs Brazil, R16
+                {"date": "2026-07-05", "type": "rating", "value": 8.9},
             ],
         },
     ],
@@ -184,29 +108,86 @@ BELGIUM = {
     "team_record_at_similar_conditions": 0.5,
 }
 
-# Real head-to-head record found: in the 5 most recent meetings (2008-2016,
-# mostly friendlies/qualifiers), Spain won all 5, scoring 11 and conceding
-# only 1. Belgium's only competitive win over Spain remains the famous 1986
-# World Cup quarterfinal (on penalties); Spain got revenge in the 1990
-# group stage.
+ENGLAND = {
+    # 4 wins, 1 draw, 0 losses; unbeaten in last 6 overall (W5 D1)
+    "win_rate": 0.8,
+    "goals_for_avg": 2.2,        # 11 goals / 5 games
+    "goals_against_avg": 1.2,    # 6 goals against / 5 games
+    "form_points_avg": 2.6,
+
+    "players": [
+        {"id": "Jordan Pickford",       "start_prob": 0.95, "events": []},
+        {
+            "id": "Marc Guehi", "start_prob": 0.8,   # minor fitness doubt, has since trained fully
+            "events": [],
+        },
+        {"id": "Ezri Konsa",            "start_prob": 0.7,  "events": []},
+        {"id": "John Stones",           "start_prob": 0.65, "events": []},
+        {
+            "id": "Jarell Quansah", "start_prob": 0.0,   # suspended (red card vs Mexico, 2-match ban)
+            "events": [
+                {"date": "2026-07-06", "type": "injury_or_out"},
+            ],
+        },
+        {"id": "Nico O'Reilly",         "start_prob": 0.55, "events": []},
+        {
+            "id": "Declan Rice", "start_prob": 0.85,   # minor fitness doubt, has since trained fully
+            "events": [],
+        },
+        {"id": "Elliot Anderson",       "start_prob": 0.75,
+         "events": [
+             {"date": "2026-07-06", "type": "rating", "value": 7.6},  # leads England for interceptions/tackles
+         ]},
+        {
+            "id": "Jude Bellingham", "start_prob": 0.9,
+            "events": [
+                {"date": "2026-06-15", "type": "goal"},   # vs Croatia, group opener
+                {"date": "2026-06-27", "type": "goal"},   # vs Panama, group finale
+                {"date": "2026-07-05", "type": "goal"},   # brace #1 vs Mexico, R16
+                {"date": "2026-07-05", "type": "goal"},   # brace #2 vs Mexico, R16
+                {"date": "2026-07-05", "type": "rating", "value": 8.6},
+            ],
+        },
+        {"id": "Bukayo Saka",           "start_prob": 0.85, "events": []},
+        {
+            "id": "Harry Kane", "start_prob": 0.9,   # captain, England's all-time leading WC scorer
+            "events": [
+                {"date": "2026-06-15", "type": "goal"},   # penalty vs Croatia
+                {"date": "2026-06-15", "type": "goal"},   # 2nd vs Croatia
+                {"date": "2026-06-27", "type": "goal"},   # header vs Panama (11th WC goal, record)
+                {"date": "2026-07-05", "type": "goal"},   # penalty vs Mexico
+                {"date": "2026-07-05", "type": "rating", "value": 8.0},
+            ],
+        },
+        {"id": "Marcus Rashford",       "start_prob": 0.55, "events": []},
+    ],
+
+    "team_record_at_similar_conditions": 0.55,
+}
+
+# Real head-to-head record found: 11 meetings (friendlies + qualifiers,
+# never before at a World Cup). England lead 6W-3D-2L, scoring 24 goals
+# and conceding 7. England unbeaten in the last 4 (two 0-0 draws, then
+# 1-0 wins in 2012 and 2014), with Norway failing to score in any of
+# those last 4 meetings.
 HEAD_TO_HEAD = {
-    "team1_win_rate": 1.0,    # Spain 5 wins from 5 in the recent dataset window
-    "avg_goal_diff": 2.0,     # (11 - 1) / 5
+    "team1_win_rate": 0.18,    # Norway: 2 wins out of 11
+    "avg_goal_diff": -1.55,    # (7 - 24) / 11, from Norway's perspective
 }
 
 VENUE = {
-    "venue_name": "Los Angeles Stadium (SoFi Stadium), Inglewood, California",
-    "pitch_type": "natural/hybrid grass, retractable roof/canopy indoor stadium",
-    "altitude_m": 30,
-    "expected_conditions": "Fully enclosed, climate-controlled indoor stadium -- consistent "
-                            "conditions regardless of Southern California weather outside",
+    "venue_name": "Hard Rock Stadium, Miami Gardens, Florida",
+    "pitch_type": "natural grass, partially covered open-air stadium",
+    "altitude_m": 3,
+    "expected_conditions": "Hot and humid South Florida July conditions -- partial canopy "
+                            "roof covers most seating but the pitch itself is open to the "
+                            "elements",
 }
 
-# Real past Spain vs Belgium results found for backtesting (most recent
-# meetings; team1 = Spain, team2 = Belgium)
+# Real past Norway vs England results for backtesting (most recent
+# meetings; team1 = Norway, team2 = England)
 KNOWN_PAST_RESULTS = [
     # (is_team1_home, team1_goals, team2_goals)
-    (False, 2, 0),   # Sept 2016 friendly, Belgium nominal home, Spain won 2-0
-    (True, 5, 0),    # 2009 World Cup qualifier, Spain won 5-0
-    (False, 2, 1),   # Oct 2008 in Brussels, Spain won 2-1
+    (True, 0, 1),    # May 2012, friendly in Oslo, England won 1-0 (Ashley Young)
+    (False, 0, 1),   # Sept 2014, friendly at Wembley, England won 1-0 (Wayne Rooney penalty)
 ]
