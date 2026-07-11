@@ -184,10 +184,13 @@ VENUE = {
                             "elements",
 }
 
-# Real past Norway vs England results for backtesting (most recent
-# meetings; team1 = Norway, team2 = England)
+# Real past Norway vs England results for backtesting (last 5 real
+# meetings found; team1 = Norway, team2 = England)
 KNOWN_PAST_RESULTS = [
     # (is_team1_home, team1_goals, team2_goals)
     (True, 0, 1),    # May 2012, friendly in Oslo, England won 1-0 (Ashley Young)
     (False, 0, 1),   # Sept 2014, friendly at Wembley, England won 1-0 (Wayne Rooney penalty)
+    (False, 0, 0),   # 1995, friendly, goalless draw
+    (True, 0, 0),    # 1994, friendly in Oslo, goalless draw
+    (True, 2, 0),    # 1993, World Cup Qualifying in Oslo, Norway won 2-0
 ]
