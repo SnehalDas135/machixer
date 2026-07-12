@@ -125,3 +125,130 @@ class ScorePredictionModel:
 
         most_likely = top5[0]
         return most_likely, top5
+
+
+# ---------------------------------------------------------------------------
+# MODEL ZOO -- trains ~20 different classifiers on the SAME feature set as
+# OutcomeModel, purely so you can compare how different algorithm families
+# call the same match. This does not replace OutcomeModel (XGBoost stays the
+# main/primary prediction printed at the top) -- it's an extra comparison
+# table appended at the end.
+# ---------------------------------------------------------------------------
+
+_OUTCOME_LABELS = {0: "Away Win", 1: "Draw", 2: "Home Win"}
+
+
+class ModelZoo:
+    def __init__(self):
+        self.scaler = StandardScaler()
+        self.models = {}
+        self.feature_cols = None
+
+    def _build_models(self):
+        from sklearn.ensemble import (
+            RandomForestClassifier, ExtraTreesClassifier, BaggingClassifier,
+            StackingClassifier, VotingClassifier, GradientBoostingClassifier,
+            AdaBoostClassifier, HistGradientBoostingClassifier,
+        )
+        from sklearn.svm import SVC
+        from sklearn.neighbors import KNeighborsClassifier
+        from sklearn.tree import DecisionTreeClassifier
+        from sklearn.naive_bayes import GaussianNB, BernoulliNB
+        from sklearn.neural_network import MLPClassifier
+        from sklearn.linear_model import RidgeClassifier, LogisticRegression, SGDClassifier
+
+        rf = RandomForestClassifier(n_estimators=200, random_state=42)
+        et = ExtraTreesClassifier(n_estimators=200, random_state=42)
+        dt = DecisionTreeClassifier(random_state=42)
+        gb = GradientBoostingClassifier(random_state=42)
+        ada = AdaBoostClassifier(random_state=42)
+        hgb = HistGradientBoostingClassifier(random_state=42)
+        xgbc = xgb.XGBClassifier(
+            n_estimators=200, max_depth=4, learning_rate=0.05,
+            subsample=0.8, colsample_bytree=0.8,
+            objective="multi:softprob", num_class=3,
+            eval_metric="mlogloss", random_state=42,
+        )
+        knn = KNeighborsClassifier(n_neighbors=15)
+        svm_rbf = SVC(kernel="rbf", probability=True, random_state=42)
+        svm_poly = SVC(kernel="poly", degree=3, probability=True, random_state=42)
+        svm_linear = SVC(kernel="linear", probability=True, random_state=42)
+        gnb = GaussianNB()
+        bnb = BernoulliNB()
+        mlp = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=500, random_state=42)
+        ridge = RidgeClassifier(random_state=42)
+        logreg = LogisticRegression(max_iter=1000, random_state=42)
+        sgd = SGDClassifier(loss="log_loss", max_iter=1000, random_state=42)
+        bagging = BaggingClassifier(estimator=DecisionTreeClassifier(), n_estimators=100, random_state=42)
+
+        # Voting/Stacking combine a few of the strongest base models above
+        voting = VotingClassifier(
+            estimators=[("rf", rf), ("xgb", xgbc), ("gb", gb)], voting="soft"
+        )
+        stacking = StackingClassifier(
+            estimators=[("rf", rf), ("xgb", xgbc), ("knn", knn)],
+            final_estimator=LogisticRegression(max_iter=1000),
+            cv=3,
+        )
+
+        self.models = {
+            "Random Forest": rf,
+            "Extra Trees": et,
+            "Bagging Classifier": bagging,
+            "Stacking Classifier": stacking,
+            "XGBoost": xgbc,
+            "HistGradientBoosting": hgb,
+            "Voting Classifier": voting,
+            "Gradient Boosting": gb,
+            "RBF SVM": svm_rbf,
+            "AdaBoost": ada,
+            "KNN": knn,
+            "Polynomial SVM": svm_poly,
+            "Decision Tree": dt,
+            "Gaussian Naive Bayes": gnb,
+            "MLP Neural Network": mlp,
+            "Linear SVM": svm_linear,
+            "Ridge Classifier": ridge,
+            "Logistic Regression": logreg,
+            "SGD Classifier": sgd,
+            "Bernoulli Naive Bayes": bnb,
+        }
+
+    def fit(self, X, y):
+        self.feature_cols = X.columns.tolist()
+        X_scaled = self.scaler.fit_transform(X)
+        self._build_models()
+        print("\n[ModelZoo] Training all comparison models (this can take a little while)...")
+        for name, model in self.models.items():
+            try:
+                model.fit(X_scaled, y)
+                print(f"  trained: {name}")
+            except Exception as e:
+                print(f"  FAILED:  {name}  ({e})")
+        return self
+
+    def predict_all(self, X_row):
+        """
+        Returns a list of tuples:
+        (model_name, predicted_label, p_away, p_draw, p_home)
+        p_away/p_draw/p_home are None for models without predict_proba
+        (e.g. RidgeClassifier, which only gives a hard class prediction).
+        """
+        X_row = X_row[self.feature_cols]
+        X_scaled = self.scaler.transform(X_row)
+        results = []
+        for name, model in self.models.items():
+            try:
+                if hasattr(model, "predict_proba"):
+                    probs = model.predict_proba(X_scaled)[0]
+                    pred_idx = int(np.argmax(probs))
+                    results.append((
+                        name, _OUTCOME_LABELS[pred_idx],
+                        float(probs[0]), float(probs[1]), float(probs[2]),
+                    ))
+                else:
+                    pred_idx = int(model.predict(X_scaled)[0])
+                    results.append((name, _OUTCOME_LABELS[pred_idx], None, None, None))
+            except Exception as e:
+                results.append((name, f"ERROR: {e}", None, None, None))
+        return results
