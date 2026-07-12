@@ -24,7 +24,7 @@ import argparse
 import numpy as np
 import pandas as pd
 
-from model import OutcomeModel, ScorePredictionModel
+from model import OutcomeModel, ScorePredictionModel, ModelZoo
 
 OUTCOME_LABELS = {0: "Away Win", 1: "Draw", 2: "Home Win"}
 
@@ -137,6 +137,10 @@ def run_real():
     _print_prediction(TEAM1, TEAM2, outcome_model, score_model, row)
     _backtest(manual_stats, TEAM1, TEAM2)
 
+    zoo = ModelZoo().fit(X, y_outcome)
+    zoo_results = zoo.predict_all(row)
+    _print_model_comparison(TEAM1, TEAM2, zoo_results)
+
 
 def _backtest(manual_stats, team1_name, team2_name):
     results = manual_stats.KNOWN_PAST_RESULTS
@@ -155,6 +159,34 @@ def _backtest(manual_stats, team1_name, team2_name):
         else:
             actual = "Away Win" if is_t1_home else "Home Win"
         print(f"  {team1_name} {t1_goals}-{t2_goals} {team2_name} -> actual: {actual}")
+
+
+def _print_model_comparison(team1_name, team2_name, zoo_results):
+    """
+    zoo_results: list of (model_name, predicted_label, p_away, p_draw, p_home)
+    Prints a plain-text aligned table comparing every model's call on the
+    SAME match/feature row. Models without predict_proba (e.g. Ridge
+    Classifier) show '--' for the probability columns since they only give
+    a hard class prediction, not a probability distribution.
+    """
+    print(f"\n=== Model Comparison Table ({team1_name} vs {team2_name}) ===")
+    header = (f"{'Model':<24}{'Predicted':<12}"
+              f"{team2_name + ' Win %':<16}{'Draw %':<10}{team1_name + ' Win %':<16}")
+    print(header)
+    print("-" * len(header))
+    for name, pred, p_away, p_draw, p_home in zoo_results:
+        if p_away is None:
+            print(f"{name:<24}{pred:<12}{'--':<16}{'--':<10}{'--':<16}")
+        else:
+            print(f"{name:<24}{pred:<12}{p_away*100:<15.1f}{p_draw*100:<9.1f}{p_home*100:<15.1f}")
+
+    # simple majority-vote summary across all models that produced a valid label
+    labels = [r[1] for r in zoo_results if r[1] in ("Home Win", "Draw", "Away Win")]
+    if labels:
+        from collections import Counter
+        counts = Counter(labels)
+        summary = ", ".join(f"{k}: {v}" for k, v in counts.most_common())
+        print(f"\nConsensus across {len(labels)} models -> {summary}")
 
 
 def run_demo():
@@ -186,6 +218,10 @@ def run_demo():
     norway_vs_england["diff_squad_strength"] = norway_vs_england["team1_squad_strength"] - norway_vs_england["team2_squad_strength"]
 
     _print_prediction("Norway", "England", outcome_model, score_model, norway_vs_england)
+
+    zoo = ModelZoo().fit(X, y_outcome)
+    zoo_results = zoo.predict_all(norway_vs_england)
+    _print_model_comparison("Norway", "England", zoo_results)
 
 
 def _print_prediction(team1_name, team2_name, outcome_model, score_model, feature_row):
