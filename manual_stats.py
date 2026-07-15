@@ -205,7 +205,7 @@ HEAD_TO_HEAD = {
 
 VENUE = {
     "venue_name": "Dallas Stadium (AT&T Stadium), Arlington, Texas",
-    "pitch_type": "natural/hybrid grass, retractable-roof stadium",
+    "pitch_type": "natural/hybrid grass,  stadium",
     "altitude_m": 180,
     "expected_conditions": "Fully enclosed, climate-controlled indoor stadium -- consistent "
                             "conditions regardless of North Texas summer heat outside",
