@@ -1,221 +1,228 @@
 """
-manual_stats.py  (France vs Spain -- FILLED WITH REAL DATA)
+manual_stats.py  (Spain vs Argentina -- FILLED WITH REAL DATA)
 ------------------------------------------------------------------
-Match: FIFA World Cup 2026, Semi-final (Match 101)
-Date/Time: Tuesday, July 14, 2026, 2:00pm ET / 19:00 GMT (Bastille Day)
-Venue: Dallas Stadium (AT&T Stadium), Arlington, Texas
+Match: FIFA World Cup 2026, FINAL
+Date/Time: Sunday, July 19, 2026, 3:00pm ET / 8:00pm BST
+Venue: New York/New Jersey Stadium (MetLife Stadium), East Rutherford, NJ
 
-Sources checked: Al Jazeera, Sports Mole (previews + team news), Yahoo
-Sports, FIFA.com, ESPN (match previews, squad news, tournament recaps)
+Sources checked: ESPN, ABC News, NBC News, beIN Sports, Yahoo Sports,
+FIFA.com, Flashscore, FOX Sports, PBS News (semifinal match reports,
+head-to-head history, tournament recaps)
 
 CONTEXT GOING IN:
-- The two pre-tournament favourites and highest-ranked European sides
-  meet in the first semifinal. France have been the tournament's most
-  dangerous attack (16 goals scored, the most of any team, with an
-  attacking trio of Mbappe/Dembele/Olise combining for the bulk of it);
-  Spain have been its most miserly defence, having conceded ZERO goals
-  across all 6 games so far (Cape Verde 0-0, Saudi Arabia 4-0, Uruguay
-  1-0, Austria 3-0, Portugal 1-0, Belgium 1-0). France are unbeaten too,
-  winning all 6 of their games (Senegal 3-1, Iraq 3-0, Norway 4-1, Sweden
-  3-0, Paraguay 1-0, Morocco 2-0).
-- Kylian Mbappe leads the Golden Boot race with 8 goals (his 20th World
-  Cup goal in as many career appearances). He picked up a minor ankle
-  knock late in the Morocco win but said afterward he was "completely
-  fine" and is expected to start as normal.
-- France have two other fitness situations being monitored, both expected
-  to be fine: Aurelien Tchouameni (thigh issue, has returned to full
-  training) and Manu Kone (minor knee knock, came off vs Morocco but
-  expected available). Saliba and Upamecano both missed a Saturday
-  training session (rest day / individual session respectively) but are
-  also expected to be fine to start.
-- Spain have a near-fully-fit squad. The only doubt is winger Victor
-  Munoz. Nico Williams and Yeremy Pino have recovered from mid-tournament
-  injuries but are expected to stay on the bench. Mikel Merino has come
-  off the bench in each of Spain's last two knockout games (Round of 16
-  vs Portugal, Quarterfinal vs Belgium) and scored the winning goal both
-  times, but is expected to remain an impact substitute rather than start.
-  Mikel Oyarzabal has 4 tournament goals and is an outside shout for the
-  Golden Boot; Lamine Yamal did not start the opener (not fully fit yet)
-  but has started every game since.
-- Historically, the sides have met 38 times overall, with Spain winning 7
-  of the last 10 meetings -- including the two most recent and highest-
-  profile: a 2-1 Spain win in the Euro 2024 semifinal (Yamal and Dani Olmo
-  scoring) and a wild 5-4 Spain win (after extra time) in the 2025 UEFA
-  Nations League semifinal (Yamal brace, Merino also scoring; Mbappe
-  scored a penalty for France). Their only prior meeting at a World Cup
-  was the 2006 Round of 16, which France won 3-1 (Franck Ribery, Patrick
-  Vieira, and Zinedine Zidane scoring).
-- Dallas Stadium (AT&T Stadium) is a retractable-roof stadium; expect
-  fully controlled indoor conditions for this match.
+- The two last teams standing at the first-ever 48-team World Cup, and
+  the first-ever World Cup Final meeting between these two countries.
+  Argentina are the reigning champions (Qatar 2022) chasing back-to-back
+  titles and a 4th star; Spain are chasing their 2nd title (their only
+  prior triumph came in South Africa 2010).
+- Argentina reached the final with a perfect 7-0-0 record, but have
+  needed extra time or late comebacks in 4 of their last 5 games: an
+  extra-time win over Cape Verde (R32), a stunning comeback from 2-0 down
+  to beat Egypt 3-2 (R16), an extra-time win over 10-man Switzerland 3-1
+  (QF), and a 2-1 semifinal win over England where Anthony Gordon put
+  England ahead before Enzo Fernandez equalized and Lautaro Martinez
+  scored a stoppage-time winner. Messi has 8 goals this tournament
+  (level with Mbappe for the Golden Boot lead before the semis, though
+  Mbappe and France have now been eliminated) but has gone two straight
+  games without scoring himself (the Switzerland QF and England SF),
+  while still being heavily involved creatively.
+- Spain reached the final with a 6-1-0 record and an extraordinary
+  defensive campaign: they have conceded just ONE goal in the entire
+  tournament (a Charles De Ketelaere header for Belgium in the
+  quarterfinal, which snapped goalkeeper Unai Simon's World Cup-record
+  650-minute shutout streak). Full record: Cape Verde 0-0 (group), Saudi
+  Arabia 4-0, Uruguay 1-0, Austria 3-0 (R32), Portugal 1-0 (R16), Belgium
+  2-1 (QF, Fabian Ruiz and Mikel Merino scoring), and a commanding 2-0
+  semifinal win over France (Mikel Oyarzabal penalty, Pedro Porro second
+  goal) that ended France's run and stopped Mbappe from getting a single
+  shot on target. This is the third summer in a row Spain have beaten
+  France in a major semifinal (Euro 2024, 2025 Nations League, now this).
+- Mikel Oyarzabal now has 5 tournament goals; Lamine Yamal (who turned 19
+  the day before the France semifinal) has been directly involved in
+  several of Spain's biggest moments, including winning the penalty
+  against France. Mikel Merino has scored a knockout-stage goal off the
+  bench in 2 of Spain's last 3 games.
+- Historically, Spain and Argentina have met 14 times, with each side
+  winning 6 and 2 draws -- a genuinely even head-to-head. They have only
+  met once before at a World Cup, the 1966 group stage, which Argentina
+  won 2-1. Their most recent meeting was a 2018 friendly, which Spain won
+  emphatically 6-1 (an Isco hat-trick).
+- No new injury/suspension news reported for either squad heading into
+  the final beyond what already applied in the semifinals.
+- MetLife Stadium is a large, open-air outdoor stadium (no roof).
 
-NOTE ON TEAM NAME: historical_data.py's dataset should match "France"
-and "Spain" directly.
+NOTE ON TEAM NAME: historical_data.py's dataset should match "Spain"
+and "Argentina" directly.
 """
 
-FRANCE = {
-    # Perfect 6-0-0 record, the tournament's top scorers (16 goals) --
-    # unbeaten through group stage, R32, R16, and the QF
-    "win_rate": 1.0,
-    "goals_for_avg": 2.67,       # 16 goals / 6 games
-    "goals_against_avg": 0.33,   # 2 goals against / 6 games
-    "form_points_avg": 3.0,
-
-    "players": [
-        {"id": "Mike Maignan",          "start_prob": 0.95, "events": []},
-        {"id": "Jules Kounde",          "start_prob": 0.9,  "events": []},
-        {
-            "id": "William Saliba", "start_prob": 0.85,   # missed Saturday training (rest day), expected fine
-            "events": [],
-        },
-        {
-            "id": "Dayot Upamecano", "start_prob": 0.85,   # missed Saturday training (individual session), expected fine
-            "events": [],
-        },
-        {"id": "Lucas Digne",           "start_prob": 0.85, "events": []},
-        {
-            "id": "Manu Kone", "start_prob": 0.65,   # minor knee knock vs Morocco, expected available
-            "events": [
-                {"date": "2026-07-11", "type": "injury_or_out"},   # came off with knee knock, downgraded severity
-            ],
-        },
-        {
-            "id": "Adrien Rabiot", "start_prob": 0.85,
-            "events": [],
-        },
-        {
-            "id": "Aurelien Tchouameni", "start_prob": 0.5,   # thigh issue, back in full training
-            "events": [
-                {"date": "2026-07-01", "type": "injury_or_out"},   # sustained after R32 win over Sweden
-            ],
-        },
-        {
-            "id": "Ousmane Dembele", "start_prob": 0.9,   # reigning Ballon d'Or winner
-            "events": [
-                {"date": "2026-06-27", "type": "goal"},   # hat-trick vs Norway, group finale
-                {"date": "2026-06-27", "type": "goal"},
-                {"date": "2026-06-27", "type": "goal"},
-                {"date": "2026-07-11", "type": "rating", "value": 8.2},
-            ],
-        },
-        {
-            "id": "Michael Olise", "start_prob": 0.85,
-            "events": [
-                {"date": "2026-07-11", "type": "rating", "value": 7.8},
-            ],
-        },
-        {
-            "id": "Kylian Mbappe", "start_prob": 0.9,   # captain; minor ankle knock but "completely fine"
-            "events": [
-                {"date": "2026-06-16", "type": "goal"},
-                {"date": "2026-06-21", "type": "goal"},
-                {"date": "2026-06-27", "type": "goal"},
-                {"date": "2026-07-01", "type": "goal"},
-                {"date": "2026-07-05", "type": "goal"},
-                {"date": "2026-07-11", "type": "goal"},   # 8th goal, vs Morocco QF; ankle knock late on
-                {"date": "2026-07-11", "type": "rating", "value": 8.4},
-            ],
-        },
-        {"id": "Desire Doue",           "start_prob": 0.5,  "events": []},   # rotates on the left with Barcola
-        {"id": "Bradley Barcola",       "start_prob": 0.5,  "events": []},   # rotates on the left with Doue
-    ],
-
-    "team_record_at_similar_conditions": 0.65,
-}
-
 SPAIN = {
-    # 5 wins, 1 draw, 0 losses; the tournament's best defensive record --
-    # yet to concede a single goal across 6 games
-    "win_rate": 0.83,
-    "goals_for_avg": 1.67,       # 10 goals / 6 games
-    "goals_against_avg": 0.0,    # 0 goals against / 6 games -- untouched all tournament
-    "form_points_avg": 2.67,
+    # 6 wins, 1 draw, 0 losses; conceded just ONE goal in the entire
+    # tournament (a genuinely historic defensive campaign)
+    "win_rate": 0.857,
+    "goals_for_avg": 1.86,        # 13 goals / 7 games
+    "goals_against_avg": 0.14,    # 1 goal against / 7 games
+    "form_points_avg": 2.71,
 
     "players": [
         {
             "id": "Unai Simon", "start_prob": 0.95,
             "events": [
-                {"date": "2026-07-11", "type": "rating", "value": 8.2},  # extended the record clean-sheet run
+                {"date": "2026-06-15", "type": "rating", "value": 7.0},
+                {"date": "2026-07-10", "type": "injury_or_out"},   # symbolic negative event: streak snapped, conceded first goal of the tournament
             ],
         },
-        {"id": "Pedro Porro",           "start_prob": 0.8,  "events": []},   # won the RB job over Llorente
-        {"id": "Pau Cubarsi",           "start_prob": 0.85, "events": []},
+        {"id": "Pedro Porro",           "start_prob": 0.85,
+         "events": [
+             {"date": "2026-07-14", "type": "goal"},   # 2nd goal vs France, SF, give-and-go with Olmo
+             {"date": "2026-07-14", "type": "rating", "value": 7.9},
+         ]},
+        {
+            "id": "Pau Cubarsi", "start_prob": 0.85,
+            "events": [
+                {"date": "2026-07-10", "type": "rating", "value": 8.4},  # Man of the Match vs Belgium, QF
+            ],
+        },
         {"id": "Aymeric Laporte",       "start_prob": 0.85, "events": []},
         {"id": "Marc Cucurella",        "start_prob": 0.85, "events": []},
+        {"id": "Rodri",                 "start_prob": 0.9,  "events": []},   # captain, midfield anchor
         {
-            "id": "Rodri", "start_prob": 0.9,   # captain, midfield anchor
-            "events": [],
+            "id": "Fabian Ruiz", "start_prob": 0.6,   # surprise starter vs Belgium, delivered
+            "events": [
+                {"date": "2026-07-10", "type": "goal"},   # opener vs Belgium, QF
+            ],
         },
-        {"id": "Fabian Ruiz",           "start_prob": 0.55, "events": []},   # rotating with Pedri
+        {"id": "Dani Olmo",             "start_prob": 0.85,
+         "events": [
+             {"date": "2026-07-14", "type": "assist"},   # assist for Porro vs France, SF
+         ]},
         {
-            "id": "Dani Olmo", "start_prob": 0.85,   # attacking midfield
-            "events": [],
-        },
-        {
-            "id": "Lamine Yamal", "start_prob": 0.85,   # didn't start opener (unfit), has started every game since
+            "id": "Lamine Yamal", "start_prob": 0.9,
             "events": [
                 {"date": "2026-06-21", "type": "goal"},
-                {"date": "2026-07-11", "type": "rating", "value": 8.0},
+                {"date": "2026-07-14", "type": "assist"},   # won the penalty vs France, SF (turned 19 the day before)
+                {"date": "2026-07-14", "type": "rating", "value": 8.3},
             ],
         },
+        {"id": "Alex Baena",            "start_prob": 0.55, "events": []},
         {
-            "id": "Alex Baena", "start_prob": 0.6,   # won the starting job over Ferran Torres
-            "events": [
-                {"date": "2026-06-26", "type": "assist"},
-            ],
-        },
-        {
-            "id": "Mikel Oyarzabal", "start_prob": 0.85,   # 4 tournament goals, outside Golden Boot shout
+            "id": "Mikel Oyarzabal", "start_prob": 0.85,
             "events": [
                 {"date": "2026-06-15", "type": "goal"},
                 {"date": "2026-06-21", "type": "goal"},
                 {"date": "2026-06-26", "type": "goal"},
                 {"date": "2026-07-02", "type": "goal"},
-                {"date": "2026-07-11", "type": "rating", "value": 7.7},
+                {"date": "2026-07-14", "type": "goal"},   # penalty vs France, SF -- 5th tournament goal
+                {"date": "2026-07-14", "type": "rating", "value": 7.8},
             ],
         },
         {
-            "id": "Mikel Merino", "start_prob": 0.35,   # impact sub, winning goal in each of last 2 knockout games
+            "id": "Mikel Merino", "start_prob": 0.4,   # impact sub, scored in 2 of last 3 games
             "events": [
                 {"date": "2026-07-06", "type": "goal"},   # winner vs Portugal, R16
-                {"date": "2026-07-11", "type": "goal"},   # winner vs Belgium, QF
-                {"date": "2026-07-11", "type": "rating", "value": 8.3},
+                {"date": "2026-07-10", "type": "goal"},   # winner vs Belgium, QF
             ],
         },
-        {"id": "Pedri",                 "start_prob": 0.4,  "events": []},   # rotated out for Fabian Ruiz recently
+        {"id": "Pedri",                 "start_prob": 0.5,  "events": []},
+    ],
+
+    "team_record_at_similar_conditions": 0.6,
+}
+
+ARGENTINA = {
+    # Perfect 7-0-0 record, the only unbeaten AND undrawn team in the
+    # tournament, but have needed extra time or late drama in 4 of their
+    # last 5 games -- a champion team that wins ugly as often as pretty
+    "win_rate": 1.0,
+    "goals_for_avg": 2.71,       # 19 goals / 7 games
+    "goals_against_avg": 1.0,    # 7 goals against / 7 games
+    "form_points_avg": 3.0,
+
+    "players": [
+        {"id": "Emiliano Martinez",     "start_prob": 0.95, "events": []},
+        {"id": "Nahuel Molina",         "start_prob": 0.7,  "events": []},
         {
-            "id": "Victor Munoz", "start_prob": 0.4,   # fitness doubt for this match
+            "id": "Cristian Romero", "start_prob": 0.85,
             "events": [
-                {"date": "2026-07-13", "type": "injury_or_out"},
+                {"date": "2026-07-07", "type": "goal"},   # header vs Egypt, R16 comeback
             ],
+        },
+        {"id": "Nicolas Otamendi",      "start_prob": 0.75, "events": []},
+        {"id": "Nicolas Tagliafico",    "start_prob": 0.6,  "events": []},
+        {
+            "id": "Enzo Fernandez", "start_prob": 0.85,
+            "events": [
+                {"date": "2026-07-07", "type": "goal"},   # dramatic stoppage-time winner vs Egypt, R16
+                {"date": "2026-07-15", "type": "goal"},   # equalizer vs England, SF
+                {"date": "2026-07-15", "type": "rating", "value": 8.2},
+            ],
+        },
+        {"id": "Rodrigo De Paul",       "start_prob": 0.85, "events": []},
+        {
+            "id": "Alexis Mac Allister", "start_prob": 0.85,
+            "events": [
+                {"date": "2026-07-11", "type": "goal"},   # opener vs Switzerland, QF (assisted by Messi)
+            ],
+        },
+        {
+            "id": "Julian Alvarez", "start_prob": 0.85,
+            "events": [
+                {"date": "2026-07-11", "type": "goal"},   # extra-time goal vs Switzerland, QF
+            ],
+        },
+        {
+            "id": "Lautaro Martinez", "start_prob": 0.8,
+            "events": [
+                {"date": "2026-07-11", "type": "goal"},   # extra-time goal vs Switzerland, QF
+                {"date": "2026-07-15", "type": "goal"},   # stoppage-time winner vs England, SF
+                {"date": "2026-07-15", "type": "rating", "value": 8.6},
+            ],
+        },
+        {
+            "id": "Lionel Messi", "start_prob": 0.9,   # captain
+            "events": [
+                {"date": "2026-06-16", "type": "goal"},
+                {"date": "2026-06-16", "type": "goal"},
+                {"date": "2026-06-16", "type": "goal"},   # hat-trick vs Algeria, group
+                {"date": "2026-06-22", "type": "goal"},
+                {"date": "2026-06-22", "type": "goal"},   # brace vs Austria, group
+                {"date": "2026-06-27", "type": "goal"},   # vs Jordan, group
+                {"date": "2026-07-03", "type": "goal"},   # vs Cape Verde, R32
+                {"date": "2026-07-07", "type": "goal"},   # 21st WC finals goal (record), vs Egypt R16
+                {"date": "2026-07-11", "type": "assist"},  # assisted Mac Allister vs Switzerland, QF
+                {"date": "2026-07-15", "type": "rating", "value": 7.5},  # 2nd straight game without a goal, still involved
+            ],
+        },
+        {"id": "Giovani Lo Celso",      "start_prob": 0.5,  "events": []},
+        {
+            "id": "Leonardo Balerdi", "start_prob": 0.0,   # pre-tournament injury, still out
+            "events": [{"date": "2026-06-01", "type": "injury_or_out"}],
         },
     ],
 
     "team_record_at_similar_conditions": 0.6,
 }
 
-# Real head-to-head record found: 38 all-time meetings, Spain winning 7 of
-# the last 10. Both of the two most recent, most notable meetings were
-# Spain wins: Euro 2024 semifinal (2-1) and the 2025 Nations League
-# semifinal (5-4 after extra time). Their only prior World Cup meeting
-# (2006 Round of 16) was won by France, 3-1.
+# Real head-to-head record found: 14 all-time meetings, each side winning
+# 6 with 2 draws -- a genuinely even historical rivalry. Only one prior
+# World Cup meeting (1966 group stage, Argentina won 2-1); most recent
+# meeting was a 2018 friendly which Spain won 6-1 (Isco hat-trick).
 HEAD_TO_HEAD = {
-    "team1_win_rate": 0.3,     # France: roughly 3 of the last 10 meetings (Spain won 7)
-    "avg_goal_diff": -1.0,     # based on the two most recent meetings, from France's perspective
+    "team1_win_rate": 0.43,    # Spain: 6 wins out of 14
+    "avg_goal_diff": 2.0,      # based on the two specific scorelines found (skewed by the 2018 rout); overall series is much closer (6-6-2)
 }
 
 VENUE = {
-    "venue_name": "Dallas Stadium (AT&T Stadium), Arlington, Texas",
-    "pitch_type": "natural/hybrid grass,  stadium",
-    "altitude_m": 180,
-    "expected_conditions": "Fully enclosed, climate-controlled indoor stadium -- consistent "
-                            "conditions regardless of North Texas summer heat outside",
+    "venue_name": "New York/New Jersey Stadium (MetLife Stadium), East Rutherford, NJ",
+    "pitch_type": "natural grass, open-air stadium",
+    "altitude_m": 3,
+    "expected_conditions": "Outdoor, no roof -- typical late-July New Jersey summer "
+                            "conditions, warm and potentially humid",
 }
 
-# Real past France vs Spain results for backtesting (most notable/recent
-# documented meetings found; team1 = France, team2 = Spain)
+# Real past Spain vs Argentina results for backtesting (the only two
+# well-documented meetings found; team1 = Spain, team2 = Argentina)
 KNOWN_PAST_RESULTS = [
     # (is_team1_home, team1_goals, team2_goals)
-    (False, 4, 5),   # 2025 UEFA Nations League semifinal (AET), Spain won 5-4
-    (False, 1, 2),   # Euro 2024 semifinal, Munich (neutral), Spain won 2-1
-    (True, 3, 1),    # 2006 World Cup Round of 16, France won 3-1
+    (True, 6, 1),    # 2018 friendly (Seville), Spain won 6-1 (Isco hat-trick)
+    (False, 1, 2),   # 1966 World Cup group stage (England, neutral-ish), Argentina won 2-1
 ]
