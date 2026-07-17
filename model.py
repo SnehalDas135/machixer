@@ -132,7 +132,7 @@ class ScorePredictionModel:
 # OutcomeModel, purely so you can compare how different algorithm families
 # call the same match. This does not replace OutcomeModel (XGBoost stays the
 # main/primary prediction printed at the top) -- it's an extra comparison
-# table appended at the end.
+# table appended at the end
 # ---------------------------------------------------------------------------
 
 _OUTCOME_LABELS = {0: "Away Win", 1: "Draw", 2: "Home Win"}
