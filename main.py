@@ -1,14 +1,14 @@
 """
-main.py  (France vs England -- Third-Place Playoff)
+main.py  (Argentina vs Spain -- FINAL)
 ------------------------------------
-Predicts France vs England: win/draw/loss probabilities AND a
+Predicts Argentina vs Spain: win/draw/loss probabilities AND a
 predicted final scoreline.
 
 RUN MODES
 =========
 1. REAL MODE (default, recommended) -- trains on ~49,000 real international
-   match results (free CSV, no API key, no signup) and pulls France's
-   and England's actual current form + head-to-head automatically:
+   match results (free CSV, no API key, no signup) and pulls Argentina's
+   and Spain's actual current form + head-to-head automatically:
        python3 main.py
 
 2. DEMO MODE -- fully synthetic data, no internet needed at all, just to
@@ -44,7 +44,7 @@ def run_real():
     import manual_stats
     from recency_scoring import compute_squad_strength
 
-    TEAM1, TEAM2 = "France", "England"
+    TEAM1, TEAM2 = "Argentina", "Spain"
 
     print(f"Loading real historical match data for {TEAM1} vs {TEAM2}...")
     df = historical_data.load_results(min_year=2005)
@@ -74,8 +74,8 @@ def run_real():
         print(f"No direct head-to-head matches found in the dataset between {TEAM1} and {TEAM2} "
               f"-- using neutral defaults (0.5 win rate, 0 goal diff).\n")
 
-    g = manual_stats.FRANCE
-    ic = manual_stats.ENGLAND
+    g = manual_stats.ARGENTINA
+    ic = manual_stats.SPAIN
     venue = manual_stats.VENUE
 
     t1_squad_strength, t1_breakdown = compute_squad_strength(g["players"])
@@ -199,29 +199,29 @@ def run_demo():
     outcome_model = OutcomeModel().fit(X, y_outcome)
     score_model = ScorePredictionModel().fit(X, y_home_goals, y_away_goals)
 
-    france_vs_england = pd.DataFrame([{
-        "team1_win_rate": 0.857,              # France (placeholder for demo only)
-        "team2_win_rate": 0.714,              # England
-        "team1_goals_for_avg": 2.29,
-        "team2_goals_for_avg": 2.0,
-        "team1_goals_against_avg": 0.57,
-        "team2_goals_against_avg": 1.43,
-        "team1_form_points_avg": 2.57,
-        "team2_form_points_avg": 2.29,
-        "team1_squad_strength": 7.7,
-        "team2_squad_strength": 7.5,
+    argentina_vs_spain = pd.DataFrame([{
+        "team1_win_rate": 1.0,                # Argentina (placeholder for demo only)
+        "team2_win_rate": 0.857,              # Spain
+        "team1_goals_for_avg": 2.71,
+        "team2_goals_for_avg": 1.86,
+        "team1_goals_against_avg": 1.0,
+        "team2_goals_against_avg": 0.14,
+        "team1_form_points_avg": 3.0,
+        "team2_form_points_avg": 2.71,
+        "team1_squad_strength": 8.6,
+        "team2_squad_strength": 8.2,
     }])
-    france_vs_england["diff_win_rate"] = france_vs_england["team1_win_rate"] - france_vs_england["team2_win_rate"]
-    france_vs_england["diff_goals_for_avg"] = france_vs_england["team1_goals_for_avg"] - france_vs_england["team2_goals_for_avg"]
-    france_vs_england["diff_goals_against_avg"] = france_vs_england["team1_goals_against_avg"] - france_vs_england["team2_goals_against_avg"]
-    france_vs_england["diff_form_points"] = france_vs_england["team1_form_points_avg"] - france_vs_england["team2_form_points_avg"]
-    france_vs_england["diff_squad_strength"] = france_vs_england["team1_squad_strength"] - france_vs_england["team2_squad_strength"]
+    argentina_vs_spain["diff_win_rate"] = argentina_vs_spain["team1_win_rate"] - argentina_vs_spain["team2_win_rate"]
+    argentina_vs_spain["diff_goals_for_avg"] = argentina_vs_spain["team1_goals_for_avg"] - argentina_vs_spain["team2_goals_for_avg"]
+    argentina_vs_spain["diff_goals_against_avg"] = argentina_vs_spain["team1_goals_against_avg"] - argentina_vs_spain["team2_goals_against_avg"]
+    argentina_vs_spain["diff_form_points"] = argentina_vs_spain["team1_form_points_avg"] - argentina_vs_spain["team2_form_points_avg"]
+    argentina_vs_spain["diff_squad_strength"] = argentina_vs_spain["team1_squad_strength"] - argentina_vs_spain["team2_squad_strength"]
 
-    _print_prediction("France", "England", outcome_model, score_model, france_vs_england)
+    _print_prediction("Argentina", "Spain", outcome_model, score_model, argentina_vs_spain)
 
     zoo = ModelZoo().fit(X, y_outcome)
-    zoo_results = zoo.predict_all(france_vs_england)
-    _print_model_comparison("France", "England", zoo_results)
+    zoo_results = zoo.predict_all(argentina_vs_spain)
+    _print_model_comparison("Argentina", "Spain", zoo_results)
 
 
 def _print_prediction(team1_name, team2_name, outcome_model, score_model, feature_row):
